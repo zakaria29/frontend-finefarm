@@ -1,0 +1,316 @@
+<!--
+=========================================================
+* Argon Dashboard - v1.2.0
+=========================================================
+* Product Page: https://www.creative-tim.com/product/argon-dashboard
+
+
+* Copyright  Creative Tim (http://www.creative-tim.com)
+* Coded by www.creative-tim.com
+
+
+
+=========================================================
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+-->
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Start your development with a Dashboard for Bootstrap 4.">
+  <meta name="author" content="Creative Tim">
+  <title>Owner | Fine Farm</title>
+  <link rel="stylesheet" href="../assets/vendor/bootstrap/dist/css/bootstrap.min.css">
+  <link type="text/css" rel="stylesheet" href="../css/bootstrap-vue.min.css"/>
+  <!-- Favicon -->
+  <link rel="icon" href="../assets/img/brand/favicon.png" type="image/png">
+  <!-- Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
+  <!-- Icons -->
+  <link rel="stylesheet" href="../assets/vendor/nucleo/css/nucleo.css" type="text/css">
+  <link rel="stylesheet" href="../assets/vendor/@fortawesome/fontawesome-free/css/all.min.css" type="text/css">
+  <!-- Argon CSS -->
+  <link rel="stylesheet" href="../assets/css/argon.css?v=1.2.0" type="text/css">
+  <link rel="stylesheet" href="https://unpkg.com/vue-select@latest/dist/vue-select.css">
+  <style media="screen">
+    ul.timeline {
+      list-style-type: none;
+      position: relative;
+    }
+    ul.timeline:before {
+        content: ' ';
+        background: #d4d9df;
+        display: inline-block;
+        position: absolute;
+        left: 29px;
+        width: 2px;
+        height: 100%;
+        z-index: 400;
+    }
+    ul.timeline > li {
+        margin: 20px 0;
+        padding-left: 20px;
+    }
+    ul.timeline > li:before {
+        content: ' ';
+        background: white;
+        display: inline-block;
+        position: absolute;
+        border-radius: 50%;
+        border: 3px solid #22c0e8;
+        left: 20px;
+        width: 20px;
+        height: 20px;
+        z-index: 400;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <!-- Sidenav -->
+    <nav class="navbar navbar-horizontal sticky-top navbar-expand-lg navbar-dark bg-default">
+      <div class="container">
+          <a class="navbar-brand" href="#">
+            <!-- <img src="../assets/img/brand/blue.png"> -->
+            <h1 style="color:white; font-weight:50px;">.FineFarm</h1>
+          </a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-default" aria-controls="navbar-default" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbar-default">
+              <div class="navbar-collapse-header">
+                  <div class="row">
+                      <div class="col-6 collapse-brand">
+                          <a href="javascript:void(0)">
+                              <img src="../assets/img/brand/blue.png">
+                          </a>
+                      </div>
+                      <div class="col-6 collapse-close">
+                          <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-default" aria-controls="navbar-default" aria-expanded="false" aria-label="Toggle navigation">
+                              <span></span>
+                              <span></span>
+                          </button>
+                      </div>
+                  </div>
+              </div>
+
+              <ul class="navbar-nav ml-lg-auto">
+                  <li class="nav-item">
+                      <a class="nav-link nav-link-icon" href="#">
+                          <i class="fa fa-home"></i>
+                          <span class="nav-link-inner--text">Home</span>
+                      </a>
+                  </li>
+                  <li class="nav-item dropdown">
+                      <a class="nav-link nav-link-icon" href="#" id="navbar-default_dropdown_1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <i class="fa fa-users"></i>
+                          <span class="nav-link-inner--text">User</span>
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbar-default_dropdown_1">
+                        <router-link class="dropdown-item" to="/owner">
+                          <i class="fa fa-user-tie"></i> Owner
+                        </router-link>
+                        <router-link class="dropdown-item" to="/cashier">
+                          <i class="fa fa-id-card-alt"></i> Cashier
+                        </router-link>
+                        <router-link class="dropdown-item" to="/customer">
+                          <i class="fa fa-users"></i> Customer
+                        </router-link>
+                        <router-link class="dropdown-item" to="/sopir">
+                          <i class="fa fa-truck-pickup"></i> Sopir
+                        </router-link>
+                        <router-link class="dropdown-item" to="/supplier">
+                          <i class="fa fa-people-carry"></i> Supplier
+                        </router-link>
+                      </div>
+                  </li>
+
+                  <li class="nav-item dropdown">
+                      <a class="nav-link nav-link-icon" href="#" id="navbar-default_dropdown_2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <i class="fa fa-cube"></i>
+                          <span class="nav-link-inner--text">Data Primer</span>
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbar-default_dropdown_2">
+                        <router-link class="dropdown-item" to="/barang">
+                          <i class="fa fa-cubes"></i> Product
+                        </router-link>
+                        <router-link class="dropdown-item" to="/pack">
+                          <i class="fa fa-box"></i> Package
+                        </router-link>
+                      </div>
+                  </li>
+
+                  <li class="nav-item dropdown">
+                      <a class="nav-link nav-link-icon" href="#" id="navbar-default_dropdown_3" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <i class="fa fa-download"></i>
+                          <span class="nav-link-inner--text">Supply</span>
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbar-default_dropdown_3">
+                        <router-link class="dropdown-item" to="/supply">
+                          <i class="fa fa-download"></i> Supply
+                        </router-link>
+                        <router-link class="dropdown-item" to="/list_supply">
+                          <i class="fa fa-list"></i> List Supply
+                        </router-link>
+                      </div>
+                  </li>
+
+                  <li class="nav-item dropdown">
+                      <a class="nav-link nav-link-icon" href="#" id="navbar-default_dropdown_4" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <i class="fa fa-shopping-cart"></i>
+                          <span class="nav-link-inner--text">Order</span>
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbar-default_dropdown_4">
+                        <router-link class="dropdown-item" to="/order">
+                          <i class="fa fa-shopping-cart"></i> Order
+                        </router-link>
+                        <router-link class="dropdown-item" to="/list_order">
+                          <i class="fa fa-list"></i> List Order
+                        </router-link>
+                      </div>
+                  </li>
+                  <li class="nav-item dropdown">
+                      <a class="nav-link nav-link-icon" href="#" id="navbar-default_dropdown_4" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <i class="fa fa-user"></i>
+                          <span class="nav-link-inner--text">
+                            {{ users === null ? "" : users.nama }}
+                          </span>
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbar-default_dropdown_4">
+                        <a v-on:click="Logout" class="dropdown-item">
+                          <i class="fa fa-sign-out-alt"></i> Sign out
+                        </a>
+                      </div>
+                  </li>
+              </ul>
+
+          </div>
+      </div>
+  </nav>
+    <!-- Main content -->
+    <div class="main-content" id="panel">
+      <!-- Header -->
+      <div class="header bg-primary pb-6">
+
+      </div>
+      <!-- Page content -->
+      <div class="container-fluid mt--5">
+        <router-view>
+        </router-view>
+      </div>
+    </div>
+  </div>
+  <!-- Argon Scripts -->
+  <!-- JavaScript files-->
+  <script src="../assets/vendor/jquery/dist/jquery.min.js"></script>
+  <script src="../assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/polyfill.min.js"></script>
+  <script src="../js/vue.min.js"></script>
+  <script src="../js/bootstrap-vue.min.js"></script>
+  <script src="../js/vue-router.js"></script>
+  <script src="../js/vue-cookies.js"></script>
+  <script src="../js/http-vue-loader.js"></script>
+  <script src="../js/axios.js"></script>
+  <script src="https://unpkg.com/vue-select@latest"></script>
+  <script type="text/javascript">
+    function formatNumber(num) {
+        // return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
+        return parseFloat(num).toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+    }
+    function formatDate(date){
+      let days = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+      let months = [
+      "Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus",
+      "September","Oktober","November","Desember"
+      ];
+      let tgl = new Date(date);
+      let parseDate = days[tgl.getDay()]+", " + tgl.getDate() + " " + months[tgl.getMonth()] +
+      " " + tgl.getFullYear();
+      return parseDate;
+    }
+
+    function formatDateTime(date){
+      let days = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+      let months = [
+      "Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus",
+      "September","Oktober","November","Desember"
+      ];
+      let tgl = new Date(date);
+      let parseDate = days[tgl.getDay()]+", " + tgl.getDate() + " " + months[tgl.getMonth()] +
+      " " + tgl.getFullYear() + " " + (tgl.getHours() < 10 ? "0"+tgl.getHours() : tgl.getHours())
+      + ":" + (tgl.getMinutes() < 10 ? "0"+tgl.getMinutes() : tgl.getMinutes());;
+      return parseDate;
+    }
+    const storage_path = "http://localhost/lumen-finefarm/storage/image/";
+    const base_url = "http://localhost/lumen-finefarm/public";
+    const type = ["danger","warning","info","primary","dark","success"];
+    let router = [
+      // { path: "/", name: "Home", component: httpVueLoader("Owner.vue")},
+      { path: "/owner", name: "Owner", component: httpVueLoader("Owner.vue")},
+      { path: "/cashier", name: "Cashier", component: httpVueLoader("Cashier.vue")},
+      { path: "/customer", name: "Customer", component: httpVueLoader("Customer.vue")},
+      { path: "/sopir", name: "Sopir", component: httpVueLoader("Sopir.vue")},
+      { path: "/supplier", name: "Supplier", component: httpVueLoader("Supplier.vue")},
+      { path: "/barang", name: "Product", component: httpVueLoader("Barang.vue")},
+      { path: "/pack", name: "Pack", component: httpVueLoader("Pack.vue")},
+      { path: "/supply", name: "Supply", component: httpVueLoader("Supply.vue")},
+      { path: "/list_supply", name: "ListSupply", component: httpVueLoader("ListSupply.vue")},
+      { path: "/edit_supply/:id_supply" , name: "EditSupply",
+      component: httpVueLoader("EditSupply.vue")},
+      { path: "/order", name: "Order", component: httpVueLoader("Order.vue")},
+      { path: "/edit_order/:id_orders" , name: "EditOrder",
+      component: httpVueLoader("EditOrder.vue")},
+      { path: "/list_order", name: "ListOrder", component: httpVueLoader("ListOrder.vue")},
+    ];
+    let routers = new VueRouter({ routes : router, base: "/owner" });
+    Vue.component('v-select', VueSelect.VueSelect)
+    let app = new Vue({
+      el: "#app",
+      data: {
+        users : null
+      },
+      router: routers,
+      methods: {
+        authenticate : function(){
+          if (!this.$cookies.isKey("Api-Token")) {
+            window.location = "login.html";
+          }else{
+            let token = this.$cookies.get("Api-Token");
+            let form = new FormData();
+            form.append("token",token);
+            axios.post(base_url+"/customer/check", form)
+            .then(response => {
+              if (response.data.auth == false) {
+                window.location = "login.html";
+              } else{
+                this.users = response.data.customer;
+              }
+            })
+            .catch(error => {
+              console.log(error);
+            });
+          }
+        },
+        Logout : function(){
+          this.$cookies.remove("Api-Token");
+          window.location = "login.html";
+        },
+      },
+      mounted(){
+        this.authenticate();
+      }
+    });
+  </script>
+  <!-- Core -->
+
+  <!-- <script src="../assets/vendor/js-cookie/js.cookie.js"></script>
+  <script src="../assets/vendor/jquery.scrollbar/jquery.scrollbar.min.js"></script>
+  <script src="../assets/vendor/jquery-scroll-lock/dist/jquery-scrollLock.min.js"></script> -->
+  <!-- Argon JS -->
+  <!-- <script src="../assets/js/argon.js?v=1.2.0"></script> -->
+</body>
+
+</html>
