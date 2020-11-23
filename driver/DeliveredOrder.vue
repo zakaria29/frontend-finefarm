@@ -172,7 +172,7 @@
             <b-col>
               <ul>
                 <li v-for="p in selectedOrder.tanggungan_pack">
-                  <b-row>
+                  <b-row v-if="p.jumlah > 0">
                     <b-col cols="6">{{ p.pack.nama_pack }}</b-col>
                     <b-col>: {{ p.jumlah }}</b-col>
                   </b-row>
@@ -214,11 +214,11 @@
             <b-col>
               <ul class="list-group">
                 <li class="list-group-item" v-for="kp in kembaliPack">
-                  <b-row>
+                  <b-row v-if="kp.max > 0">
                     <b-col cols="6">{{ kp.nama_pack }}</b-col>
                     <b-col cols="3">
                        <b-form-input type="number" v-model="kp.jumlah" :max="kp.max"
-                       min="1" size="sm">
+                        size="sm">
                        </b-form-input>
                     </b-col>
                   </b-row>

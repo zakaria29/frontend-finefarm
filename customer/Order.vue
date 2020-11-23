@@ -343,9 +343,9 @@
             this.$bvToast.show("loading");
             let form = new FormData();
             form.append("id_orders", this.orders.id_orders);
-            form.append("id_users", null);
+            form.append("id_users", "");
             form.append("id_pembeli", this.orders.id_pembeli);
-            form.append("id_sopir", null);
+            form.append("id_sopir", "");
             form.append("waktu_order",this.orders.date_order + " " + this.orders.time_order);
             form.append("waktu_pengiriman", this.orders.waktu_pengiriman);
             form.append("tgl_jatuh_tempo", this.orders.tgl_jatuh_tempo);

@@ -21,7 +21,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="Start your development with a Dashboard for Bootstrap 4.">
   <meta name="author" content="Creative Tim">
-  <title>Owner | Fine Farm</title>
+  <title>Customer | Fine Farm</title>
   <link rel="stylesheet" href="../assets/vendor/bootstrap/dist/css/bootstrap.min.css">
   <link type="text/css" rel="stylesheet" href="../css/bootstrap-vue.min.css"/>
   <!-- Favicon -->
@@ -170,6 +170,9 @@
                         <router-link class="dropdown-item" to="/list_order">
                           <i class="fa fa-list"></i> List Order
                         </router-link>
+                        <router-link class="dropdown-item" to="/pay-orders">
+                          <i class="fa fa-money-bill-alt"></i> Pembayaran Order
+                        </router-link>
                       </div>
                   </li>
                   <li class="nav-item dropdown">
@@ -249,7 +252,7 @@
     const type = ["danger","warning","info","primary","dark","success"];
     let router = [
       // { path: "/", name: "Home", component: httpVueLoader("Owner.vue")},
-      { path: "/owner", name: "Owner", component: httpVueLoader("Owner.vue")},
+      { path: "/pay-orders", name: "PayOrder", component: httpVueLoader("PayOrder.vue")},
       { path: "/cashier", name: "Cashier", component: httpVueLoader("Cashier.vue")},
       { path: "/customer", name: "Customer", component: httpVueLoader("Customer.vue")},
       { path: "/sopir", name: "Sopir", component: httpVueLoader("Sopir.vue")},
