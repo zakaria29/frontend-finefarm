@@ -365,6 +365,7 @@
           this.message = response.data.message;
           this.$bvToast.show("message");
           this.find();
+          window.open(base_url + "/struk/" + this.selectedOrder.id_orders,'_blank');
         })
         .catch(error => {
           alert(error);

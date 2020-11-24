@@ -39,6 +39,7 @@
               <h4>ID Order: {{ item.id_orders }}</h4>
               <h4>Waktu Order: {{ formatDateTime(item.waktu_order) }}</h4>
               <h4>Waktu Kirim: {{ formatDate(item.waktu_pengiriman) }}</h4>
+              <h3 class="text-info">Total: Rp {{ formatNumber(item.total_bayar) }}</h3>
             </b-col>
             <b-col cols="5">
               <h4>Customer: {{ item.pembeli.nama }}</h4>
@@ -46,27 +47,30 @@
               <h4>Sopir: {{ item.sopir === null ? "-" : item.sopir.nama }}</h4>
             </b-col>
             <b-col>
-              <b-button class="btn btn-block btn-sm btn-info" v-if="(item.id_status_orders < 3)"
+              <b-button size="sm" class="btn btn-block btn-sm btn-info" v-if="(item.id_status_orders < 3)"
               @click="Edit(item.id_orders)">
                 <span class="fa fa-edit"></span> Edit Order
               </b-button>
 
-              <b-button class="btn btn-block btn-sm btn-success" v-b-modal.modal_detail
+              <b-button size="sm" class="btn btn-block btn-sm btn-success" v-b-modal.modal_detail
               @click="Detail(item)">
                 <span class="fa fa-eye"></span> Detail Order
               </b-button>
 
-              <b-button class="btn btn-block btn-sm btn-warning" v-b-modal.modal_log
+              <b-button size="sm" class="btn btn-block btn-sm btn-warning" v-b-modal.modal_log
               @click="LogOrder(item)">
                 <span class="fa fa-history"></span> Log Order
+              </b-button>
+
+              <b-button size="sm" class="btn btn-block btn-sm btn-dark"
+              @click="Print(item)">
+                <span class="fa fa-print"></span> Struk Order
               </b-button>
             </b-col>
           </b-row>
           <b-row>
+
             <b-col>
-              <h3 class="text-info">Total: Rp {{ formatNumber(item.total_bayar) }}</h3>
-            </b-col>
-            <b-col cols="7">
               <b-badge pill :variant="type[item.id_status_orders]">
                 Status: {{ item.status_orders.nama_status_order }}
               </b-badge>
@@ -157,7 +161,7 @@
       border-variant="info" hide-footer>
 
       <ul class="timeline">
-        <li v-for="l in log_orders">
+        <li style="border-radius:5px;" class="bg-lighter p-2 m-2" v-for="l in log_orders">
 					<span class="text-default">{{ l.nama }}</span>
 					<span class="text-warning float-right">
             <small>{{ formatDateTime(l.waktu) }}</small>
@@ -165,6 +169,9 @@
 					<p>
             {{ l.status_orders.nama_status_order }}
           </p>
+          <b-badge pill class="bg-blue text-white">
+            <strong> <i>Oleh: {{ l.users.nama }}</i> </strong>
+          </b-badge>
 				</li>
       </ul>
     </b-modal>
@@ -218,6 +225,10 @@
 
       LogOrder : function(item){
         this.log_orders = item.log_orders;
+      },
+
+      Print : function(item){
+        window.open(base_url + "/struk/" + item.id_orders,'_blank');
       },
 
       find : function(){

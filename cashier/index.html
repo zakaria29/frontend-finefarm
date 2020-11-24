@@ -116,6 +116,9 @@
                         <router-link class="dropdown-item" to="/setoran-pack">
                           <i class="fa fa-cubes"></i> Setoran Pack
                         </router-link>
+                        <router-link class="dropdown-item" to="/verify-pembayaran">
+                          <i class="fa fa-coins"></i> Verifikasi Pembayaran
+                        </router-link>
                       </div>
                   </li>
 
@@ -248,6 +251,7 @@
       // { path: "/", name: "Home", component: httpVueLoader("Owner.vue")},
       { path: "/setoran-uang", name: "SetoranUang", component: httpVueLoader("SetoranUang.vue")},
       { path: "/setoran-pack", name: "SetoranPack", component: httpVueLoader("SetoranPack.vue")},
+      { path: "/verify-pembayaran", name: "VerifyPembayaran", component: httpVueLoader("VerifyPembayaran.vue")},
       { path: "/customer", name: "Customer", component: httpVueLoader("Customer.vue")},
       { path: "/sopir", name: "Sopir", component: httpVueLoader("Sopir.vue")},
       { path: "/supplier", name: "Supplier", component: httpVueLoader("Supplier.vue")},
