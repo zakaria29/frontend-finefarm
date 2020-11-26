@@ -7,26 +7,7 @@
     </div>
 
     <div class="card-body">
-
       <form v-on:submit.prevent="Save">
-        <div class="row mb-2">
-          <div class="col-3">
-            Customer
-          </div>
-          <div class="col-9">
-            <v-select :options="customer" @input="Customer()"
-            :reduce="nama => nama.id_users" label="nama" v-model="orders.id_pembeli">
-            <template #search="{attributes, events}">
-              <input
-                class="vs__search"
-                :required="!orders.id_pembeli"
-                v-bind="attributes"
-                v-on="events"
-              />
-            </template>
-            </v-select>
-          </div>
-        </div>
 
         <div class="row mb-2">
           <div class="col-sm-3">
@@ -46,7 +27,7 @@
           </div>
           <div class="col-3">
             <input type="date" v-model="orders.waktu_pengiriman"
-            class="form-control" required @change="setJatuhTempo()" />
+            class="form-control" required />
           </div>
           <div class="col-2">
             Jatuh Tempo
@@ -93,26 +74,6 @@
             class="form-control" required />
           </div>
         </div>
-
-        <div class="row mb-2">
-          <div class="col-3">
-            Sopir
-          </div>
-          <div class="col-6">
-            <v-select :options="driver"
-            :reduce="nama => nama.id_users" label="nama" v-model="orders.id_sopir">
-            <template #search="{attributes, events}">
-              <input
-                class="vs__search"
-                :required="!orders.id_sopir"
-                v-bind="attributes"
-                v-on="events"
-              />
-            </template>
-            </v-select>
-          </div>
-        </div>
-
         <div class="row col-12 mb-2">
           <h4>List Barang</h4>
           <br />
@@ -130,7 +91,7 @@
                 </div>
 
                 <div class="col-2">
-                  Qty ({{ d.satuan }})
+                  Qty
                    <b-form-input v-model="d.jumlah_barang" type="number"
                    v-on:keyup="SelectPack(index)">
                  </b-form-input>
@@ -235,14 +196,15 @@
         message: "",
         margin: 0,
         margin_group: 0,
-        barang: [],
         driver: [],
+        barang: [],
         customer: [],
         detail_order: [],
         orders: {
           id_orders: "",
           id_users: "",
           id_pembeli: "",
+          id_sopir: "",
           date_order: "",
           time_order: "",
           waktu_pengiriman: "",
@@ -253,10 +215,8 @@
           po: "",
           invoice: "",
           catatan: "",
-          id_sopir: "",
         },
         dp: false,
-        jatuh_tempo: 0,
       }
     },
 
@@ -275,14 +235,12 @@
           harga_pack: "",
           jumlah_pack: 0,
           beli_pack : 0,
-          satuan: ""
         });
       },
 
       SelectBarang : function(id,index){
         let item = this.barang.find(it => it.id_barang === id);
         this.detail_order[index].pack = item.pack;
-        this.detail_order[index].satuan = item.satuan === "1" ? "Kg" : "Butir";
         this.detail_order[index].harga_beli =
         Number(this.margin) + Number(item.harga) + Number(this.margin_group);
         this.detail_order[index].id_pack = item.pack[0].id_pack;
@@ -291,8 +249,8 @@
       SelectPack : function(index){
         let id = this.detail_order[index].id_pack;
         let item = this.detail_order[index].pack.find(it => it.id_pack === id);
-        this.detail_order[index].beli_pack = item.harga;
         let barang = this.barang.find(it => it.id_barang === this.detail_order[index].id_barang);
+        // console.log(item);
         if (barang.satuan === "1") {
           this.detail_order[index].jumlah_pack =
           Math.ceil(Number(this.detail_order[index].jumlah_barang) * Number(item.kapasitas_kg));
@@ -300,13 +258,13 @@
           this.detail_order[index].jumlah_pack =
           Math.ceil(Number(this.detail_order[index].jumlah_barang) * Number(item.kapasitas_butir));
         }
-
+        this.detail_order[index].beli_pack = item.harga;
         this.BeliPack(index);
 
       },
 
       BeliPack : function(index){
-        if (this.detail_order[index].harga_pack) {
+        if (this.detail_order[index].harga_pack > 0) {
           let id_pack = this.detail_order[index].id_pack;
           let pack = this.detail_order[index].pack.find(it => it.id_pack === id_pack);
           this.detail_order[index].harga_pack = pack.harga;
@@ -319,34 +277,6 @@
         let item = this.customer.find(it => it.id_users === this.orders.id_pembeli);
         this.margin = item.margin;
         this.margin_group = item.margin_group;
-        this.jatuh_tempo = item.jatuh_tempo;
-        if (this.orders.waktu_pengiriman !== "") {
-          let send = new Date(this.orders.waktu_pengiriman)
-          send.setDate(Number(send.getDate()) + Number(this.jatuh_tempo))
-          this.orders.tgl_jatuh_tempo = send.toISOString().slice(0,10);;
-          // console.log(this.orders.tgl_jatuh_tempo);
-        }
-        let nama = item.nama;
-        var initials = nama.match(/\b\w/g) || [];
-        initials = ((initials.shift() || '') + (initials.pop() || '')).toUpperCase();
-        let count = Number(item.orders.length) + 1;
-        let urutan = null;
-        if (count.toString().length == 1) {
-          urutan = "00" + count;
-        }else if(count.toString().length == 2){
-          urutan = "0" + count;
-        }
-        let d = new Date();
-        this.orders.invoice = d.getFullYear().toString() + (d.getMonth()+1).toString() +
-        d.getDate().toString() +  initials + urutan;
-      },
-
-      setJatuhTempo : function(){
-        let send = new Date(this.orders.waktu_pengiriman)
-        // console.log(this.jatuh_tempo);
-        send.setDate(Number(send.getDate()) + Number(this.jatuh_tempo))
-        this.orders.tgl_jatuh_tempo = send.toISOString().slice(0,10);;
-        // console.log(this.orders.tgl_jatuh_tempo);
       },
 
       CountTotal : function(){
@@ -389,17 +319,6 @@
         })
       },
 
-      get_driver : function(){
-        let conf = { headers: { "Api-Token" : this.key} };
-        axios.get(base_url + "/driver", conf)
-        .then(response => {
-          this.driver = response.data.driver;
-        })
-        .catch(error => {
-          alert(error);
-        })
-      },
-
       Save : function(){
         if (this.detail_order.length > 0) {
           if (confirm("Apakah Anda yakin dengan order ini?")) {
@@ -407,7 +326,7 @@
             this.$bvToast.show("loading");
             let form = new FormData();
             form.append("id_orders", this.orders.id_orders);
-            form.append("id_users", this.orders.id_users);
+            form.append("id_users", this.orders.id_users); // sementara
             form.append("id_pembeli", this.orders.id_pembeli);
             form.append("id_sopir", this.orders.id_sopir);
             form.append("waktu_order",this.orders.date_order + " " + this.orders.time_order);
@@ -421,12 +340,12 @@
             form.append("catatan", this.orders.catatan);
             form.append("detail_orders", JSON.stringify(this.detail_order));
 
-            axios.post(base_url + "/orders/new_order", form, conf)
+            axios.post(base_url + "/orders/update_order", form, conf)
             .then(response => {
               this.$bvToast.hide("loading");
               this.message = response.data.message;
               this.$bvToast.show("message");
-              this.refresh();
+              this.get_order();
             })
             .catch(error => {
               alert(error);
@@ -437,67 +356,70 @@
         }
       },
 
+
+      get_order : function(){
+        let conf = { headers: { "Api-Token" : this.key} };
+        axios.get(base_url + "/orders/get/" + this.orders.id_orders)
+        .then(response => {
+          this.margin =  response.data.orders.margin;
+          this.margin_group = response.data.orders.margin_group;
+          this.detail_order = response.data.orders.detail_orders;
+          this.orders.id_users =  response.data.orders.id_users === "" ?
+          "" : this.users.id_users;
+          this.orders.id_pembeli =  response.data.orders.id_pembeli;
+          this.orders.id_sopir =  response.data.orders.id_sopir === "" ?
+          "" : this.users.id_sopir;
+
+          this.orders.waktu_pengiriman =  response.data.orders.waktu_pengiriman;
+          this.orders.tgl_jatuh_tempo =  response.data.orders.tgl_jatuh_tempo;
+          this.orders.tipe_pembayaran =
+          response.data.orders.down_payment > 0 ? "2" : response.data.orders.tipe_pembayaran;
+          this.orders.total_bayar =  response.data.orders.total_bayar;
+          this.orders.down_payment =  response.data.orders.down_payment;
+          this.orders.po =  response.data.orders.po;
+          this.orders.invoice =  response.data.orders.invoice;
+          this.orders.catatan =  response.data.orders.catatan;
+          this.dp= response.data.orders.down_payment > 0 ? true : false;
+
+          let date = new Date(response.data.orders.waktu_order);
+          let currentDate = date.toISOString().slice(0,10);
+          let currentTime = date.getHours() + ':' + date.getMinutes();
+          this.orders.date_order = currentDate;
+          // this.supply.time = currentTime;
+          this.orders.time_order = (date.getHours() < 10 ? "0"+date.getHours() : date.getHours())
+          + ":" + (date.getMinutes() < 10 ? "0"+date.getMinutes() : date.getMinutes());
+        })
+        .catch(error => {
+          alert(error);
+        });
+      },
+
       initUser: function(){
         let token = this.$cookies.get("Api-Token");
         let form = new FormData();
         form.append("token",token);
-        axios.post(base_url+"/owner/check", form)
+        axios.post(base_url+"/customer/check", form)
         .then(response => {
           if (response.data.auth == false) {
             window.location = "login.html";
           } else{
-            this.users = response.data.owner;
-            this.orders.id_users = response.data.owner.id_users;
+            this.key = token;
+            this.users = response.data.customer;
             this.get_barang();
-            this.get_customer();
-            this.get_driver();
+            this.get_order();
+
           }
         })
         .catch(error => {
           console.log(error);
         });
       },
-
-      refresh : function(){
-        this.margin =  0
-        this.margin_group = 0;
-        this.detail_order = [];
-        this.orders.id_orders =  "";
-        this.orders.id_users =  "";
-        this.orders.id_pembeli =  "";
-
-        this.orders.waktu_pengiriman =  "";
-        this.orders.tgl_jatuh_tempo =  "";
-        this.orders.tipe_pembayaran =  "";
-        this.orders.total_bayar =  0;
-        this.orders.down_payment =  0;
-        this.orders.po =  "";
-        this.orders.invoice =  "";
-        this.orders.catatan =  "";
-        this.dp= false;
-
-        let date = new Date();
-        let currentDate = date.toISOString().slice(0,10);
-        let currentTime = date.getHours() + ':' + date.getMinutes();
-        this.orders.date_order = currentDate;
-        // this.supply.time = currentTime;
-        this.orders.time_order = (date.getHours() < 10 ? "0"+date.getHours() : date.getHours())
-        + ":" + (date.getMinutes() < 10 ? "0"+date.getMinutes() : date.getMinutes());
-      },
     },
 
 
     mounted(){
+      this.orders.id_orders = this.$route.params.id_orders;
       this.initUser();
-      let date = new Date();
-      let currentDate = date.toISOString().slice(0,10);
-      let currentTime = date.getHours() + ':' + date.getMinutes();
-      this.orders.date_order = currentDate;
-      // this.supply.time = currentTime;
-      this.orders.time_order = (date.getHours() < 10 ? "0"+date.getHours() : date.getHours())
-      + ":" + (date.getMinutes() < 10 ? "0"+date.getMinutes() : date.getMinutes());
-
-
     }
   }
 </script>

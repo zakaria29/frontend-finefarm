@@ -352,24 +352,26 @@
       },
 
       sendOrder : function(){
-        this.$bvToast.show("loading");
-        this.$bvModal.hide("modal_send");
-        let conf = { headers: { "Api-Token" : this.key} };
-        let form = new FormData();
-        form.append("id_users", this.users.id_users);
-        form.append("detail_ambil_stok", JSON.stringify(this.detail_ambil_stok));
+        if (confirm("Apakah Anda yakin ingin mengirim order ini?")) {
+          this.$bvToast.show("loading");
+          this.$bvModal.hide("modal_send");
+          let conf = { headers: { "Api-Token" : this.key} };
+          let form = new FormData();
+          form.append("id_users", this.users.id_users);
+          form.append("detail_ambil_stok", JSON.stringify(this.detail_ambil_stok));
 
-        axios.post(base_url + "/send-orders/" + this.selectedOrder.id_orders, form, conf)
-        .then(response => {
-          this.$bvToast.hide("loading");
-          this.message = response.data.message;
-          this.$bvToast.show("message");
-          this.find();
-          window.open(base_url + "/struk/" + this.selectedOrder.id_orders,'_blank');
-        })
-        .catch(error => {
-          alert(error);
-        })
+          axios.post(base_url + "/send-orders/" + this.selectedOrder.id_orders, form, conf)
+          .then(response => {
+            this.$bvToast.hide("loading");
+            this.message = response.data.message;
+            this.$bvToast.show("message");
+            this.find();
+            window.open(base_url + "/struk/" + this.selectedOrder.id_orders,'_blank');
+          })
+          .catch(error => {
+            alert(error);
+          })
+        }
       },
 
       find : function(){

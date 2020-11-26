@@ -25,8 +25,9 @@
         <div class="mt-2" v-if="bill.length > 0">
           <h4>Verifikasi Setoran Uang: {{ "Rp " + formatNumber(getTotal(bill)) }}</h4>
           <h5 class="mb-1">Upload Bukti Pembayaran</h5>
-          <b-form-file v-model="bukti" choose-label="Attach Bukti Pembayaran" required>
-          </b-form-file>
+          <!-- <b-form-file v-model="bukti" required>
+          </b-form-file> -->
+          <input type="file" class="form-control" id="bukti" v-model="bukti" required />
           <ul class="mb-3 list-group">
             <li class="list-group-item" v-for="item in bill">
               <b-row>
@@ -38,7 +39,7 @@
                 <b-col cols="4">{{ "Rp " + formatNumber(item.nominal) }}</b-col>
                 <b-col cols="4">
                   <b-button class="btn btn-sm btn-success" v-b-modal.modal_detail
-                  @click="Detail(item)">
+                  @click="Detail(item.orders)">
                     <span class="fa fa-eye"></span> Detail Order
                   </b-button>
                 </b-col>
@@ -51,6 +52,8 @@
         v-if="bill.length > 0">
           Verifikasi Setoran Uang
         </b-button>
+
+
       </form>
   </div>
 
@@ -201,20 +204,22 @@
 
       pay : function(){
         if (confirm("Apakah Anda yakin data ini telah terverifikasi?")) {
+          let selectBill = [];
           this.bill.forEach((item, i) => {
             if (item.status === "1"){
-              this.selectedBill.push({
+              selectBill.push({
                 id_orders: item.id_orders,
                 nominal: item.nominal
               })
             }
           });
-          if (this.selectedBill.length == 0) {
+          if (selectBill.length > 0) {
             this.$bvToast.show("loading");
             let conf = { headers: { "Api-Token" : this.key} };
             let form = new FormData();
-            form.append("pembayaran_orders", JSON.stringify(this.selectedBill));
-            form.append("bukti", this.bukti);
+            form.append("pembayaran_orders", JSON.stringify(selectBill));
+            // form.append("bukti", this.bukti);
+            form.append("bukti", document.getElementById('bukti').files[0]);
             form.append("id_users", this.users.id_users);
             axios.post(base_url + "/pay-orders", form, conf)
             .then(response => {

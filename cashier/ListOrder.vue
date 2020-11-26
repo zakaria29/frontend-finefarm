@@ -4,8 +4,10 @@
       <h3>
         <span class="fa fa-list"></span> Data Order
       </h3>
+
     </div>
     <div class="card-body">
+      <h4>Filter Data</h4>
       <form v-on:submit.prevent="find">
         <div class="row mb-2">
           <div class="col-2">
@@ -31,7 +33,37 @@
           </div>
         </div>
       </form>
+      <hr />
 
+
+      <b-row id="summary" class="mt-2">
+        <b-col>
+          <h4 class="mt-2">Summary</h4>
+          <b-row>
+            <b-col cols="3">Modal</b-col>
+            <b-col cols="9">: {{ "Rp " + formatNumber(summary.modal) }}</b-col>
+            <b-col cols="3">Total Orders</b-col>
+            <b-col cols="9">: {{ "Rp " + formatNumber(summary.totalOrders) }}</b-col>
+            <b-col cols="3">Cash</b-col>
+            <b-col cols="9">: {{ "Rp " + formatNumber(summary.cash) }}</b-col>
+            <b-col cols="3">Piutang</b-col>
+            <b-col cols="9">: {{ "Rp " + formatNumber(summary.piutang) }}</b-col>
+          </b-row>
+        </b-col>
+        <b-col>
+          <h4 class="mt-2">Produk yang terjual</h4>
+          <b-row v-for="b in summary.barang">
+            <b-col v-if="b.log_stok_barang.length > 0">{{ b.nama_barang }}</b-col>
+            <b-col v-if="b.log_stok_barang.length > 0">
+              : {{ b.log_stok_barang[0].jumlah + " " }}
+              {{ (b.satuan === "1") ? "Kg" : "Butir" }}
+            </b-col>
+          </b-row>
+        </b-col>
+      </b-row>
+      <hr />
+
+      <h4 class="mt-2">List Order</h4>
       <ul class="list-group mt-2">
         <li class="list-group-item mb-2" v-for="item in orders">
           <b-row>
@@ -39,7 +71,26 @@
               <h4>ID Order: {{ item.id_orders }}</h4>
               <h4>Waktu Order: {{ formatDateTime(item.waktu_order) }}</h4>
               <h4>Waktu Kirim: {{ formatDate(item.waktu_pengiriman) }}</h4>
-              <h3 class="text-info">Total: Rp {{ formatNumber(item.total_bayar) }}</h3>
+              <b-row>
+                <b-col>
+                  <h3 class="text-info">
+                    Total: Rp {{ formatNumber(item.total_bayar) }}
+
+                    <b-badge pill variant="success"
+                    v-if="item.tagihan !== null && item.tagihan.status === '2'">
+                      <strong>Lunas</strong>
+                    </b-badge>
+                    <b-badge pill variant="warning"
+                    v-if="item.tagihan !== null && item.tagihan.status === '0'">
+                      <strong>Menunggu Verifikasi Pembayaran</strong>
+                    </b-badge>
+                    <b-badge pill variant="danger"
+                    v-if="item.tagihan !== null && item.tagihan.status === '1'">
+                      <strong>Belum Lunas</strong>
+                    </b-badge>
+                  </h3>
+                </b-col>
+              </b-row>
             </b-col>
             <b-col cols="5">
               <h4>Customer: {{ item.pembeli.nama }}</h4>
@@ -203,10 +254,20 @@
           tgl_jatuh_tempo: "",
           total_bayar: 0,
         },
+        summary: {
+          totalOrders: 0,
+          modal: 0,
+          cash: 0,
+          piutang: 0,
+          barang: []
+        },
+
       }
     },
 
     methods: {
+
+
       Edit : function(id){
         this.$router.push({ name: "EditOrder", params: { id_orders: id }});
 
@@ -245,7 +306,19 @@
           this.totalRow = response.data.count;
         })
         .catch(error => {
-          alert(error);
+          console.log(error);
+        })
+
+        axios.post(base_url + "/summary-orders", form, conf)
+        .then(response => {
+          this.summary.totalOrders = response.data.total_orders;
+          this.summary.cash = response.data.cash;
+          this.summary.modal = response.data.modal;
+          this.summary.piutang = response.data.piutang;
+          this.summary.barang = response.data.barang;
+        })
+        .catch(error => {
+          console.log(error);
         })
       }
     },

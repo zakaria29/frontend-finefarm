@@ -255,10 +255,10 @@
         let barang = this.barang.find(it => it.id_barang === this.detail_order[index].id_barang);
         if (barang.satuan === "1") {
           this.detail_order[index].jumlah_pack =
-          Math.ceil(Number(this.detail_order[index].jumlah_barang) * Number(item.kapasitas_kg/10));
+          Math.ceil(Number(this.detail_order[index].jumlah_barang) * Number(item.kapasitas_kg));
         }else if (barang.satuan === "2") {
           this.detail_order[index].jumlah_pack =
-          Math.ceil(Number(this.detail_order[index].jumlah_barang) * Number(1 / item.kapasitas_butir));
+          Math.ceil(Number(this.detail_order[index].jumlah_barang) * Number(item.kapasitas_butir));
         }
 
         this.BeliPack(index);
@@ -387,6 +387,20 @@
             this.jatuh_tempo = response.data.customer.jatuh_tempo;
             this.margin = response.data.customer.margin;
             this.margin_group = response.data.customer.group_customer.margin;
+
+            let nama = response.data.customer.nama;
+            var initials = nama.match(/\b\w/g) || [];
+            initials = ((initials.shift() || '') + (initials.pop() || '')).toUpperCase();
+            let count = Number(response.data.customer.orders.length) + 1;
+            let urutan = null;
+            if (count.toString().length == 1) {
+              urutan = "00" + count;
+            }else if(count.toString().length == 2){
+              urutan = "0" + count;
+            }
+            let d = new Date();
+            this.orders.invoice = d.getFullYear().toString() + (d.getMonth()+1).toString() +
+            d.getDate().toString() +  initials + urutan;
           }
         })
         .catch(error => {

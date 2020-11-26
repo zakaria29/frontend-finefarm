@@ -29,6 +29,7 @@
               <h4>ID Order: {{ item.id_orders }}</h4>
               <h4>Waktu Order: {{ formatDateTime(item.waktu_order) }}</h4>
               <h4>Waktu Kirim: {{ formatDate(item.waktu_pengiriman) }}</h4>
+              <h3 class="text-info">Total: Rp {{ formatNumber(item.total_bayar) }}</h3>
             </b-col>
             <b-col cols="5">
               <h4>Customer: {{ item.pembeli.nama }}</h4>
@@ -54,9 +55,6 @@
           </b-row>
           <b-row>
             <b-col>
-              <h3 class="text-info">Total: Rp {{ formatNumber(item.total_bayar) }}</h3>
-            </b-col>
-            <b-col cols="7">
               <b-badge pill :variant="type[item.id_status_orders]">
                 Status: {{ item.status_orders.nama_status_order }}
               </b-badge>

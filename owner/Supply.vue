@@ -178,7 +178,7 @@
         let conf = { headers: { "Api-Token" : this.key} };
         axios.get(base_url + "/supplier", conf)
         .then(response => {
-          this.supplier = response.data.supplier;
+          this.supplier = response.data;
         })
         .catch(error => {
           alert(error);
@@ -224,7 +224,9 @@
         let currentDate = date.toISOString().slice(0,10);
         let currentTime = date.getHours() + ':' + date.getMinutes();
         this.supply.date = currentDate;
-        this.supply.time = currentTime;
+        // this.supply.time = currentTime;
+        this.supply.time = (date.getHours() < 10 ? "0"+date.getHours() : date.getHours())
+        + ":" + (date.getMinutes() < 10 ? "0"+date.getMinutes() : date.getMinutes());
       },
     },
 

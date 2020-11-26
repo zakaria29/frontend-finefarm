@@ -99,10 +99,10 @@
 
               <ul class="navbar-nav ml-lg-auto">
                   <li class="nav-item">
-                      <a class="nav-link nav-link-icon" href="#">
+                      <router-link class="nav-link nav-link-icon" to="/">
                           <i class="fa fa-home"></i>
                           <span class="nav-link-inner--text">Home</span>
-                      </a>
+                      </router-link>
                   </li>
                   <li class="nav-item dropdown">
                       <a class="nav-link nav-link-icon" href="#" id="navbar-default_dropdown_1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -251,7 +251,7 @@
     const base_url = "http://localhost/lumen-finefarm/public";
     const type = ["danger","warning","info","primary","dark","success"];
     let router = [
-      // { path: "/", name: "Home", component: httpVueLoader("Owner.vue")},
+      { path: "/", name: "Home", component: httpVueLoader("Dashboard.vue")},
       { path: "/owner", name: "Owner", component: httpVueLoader("Owner.vue")},
       { path: "/cashier", name: "Cashier", component: httpVueLoader("Cashier.vue")},
       { path: "/customer", name: "Customer", component: httpVueLoader("Customer.vue")},

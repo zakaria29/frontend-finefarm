@@ -289,10 +289,10 @@
         let barang = this.barang.find(it => it.id_barang === this.detail_order[index].id_barang);
         if (barang.satuan === "1") {
           this.detail_order[index].jumlah_pack =
-          Math.ceil(Number(this.detail_order[index].jumlah_barang) * Number(item.kapasitas_kg/10));
+          Math.ceil(Number(this.detail_order[index].jumlah_barang) * Number(item.kapasitas_kg));
         }else if (barang.satuan === "2") {
           this.detail_order[index].jumlah_pack =
-          Math.ceil(Number(this.detail_order[index].jumlah_barang) * Number(1 / item.kapasitas_butir));
+          Math.ceil(Number(this.detail_order[index].jumlah_barang) * Number(item.kapasitas_butir));
         }
         this.detail_order[index].beli_pack = item.harga;
         this.BeliPack(index);

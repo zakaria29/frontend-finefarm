@@ -41,6 +41,26 @@
               <h4>ID Order: {{ item.id_orders }}</h4>
               <h4>Waktu Order: {{ formatDateTime(item.waktu_order) }}</h4>
               <h4>Waktu Kirim: {{ formatDate(item.waktu_pengiriman) }}</h4>
+              <b-row>
+                <b-col>
+                  <h3 class="text-info">
+                    Total: Rp {{ formatNumber(item.total_bayar) }}
+
+                    <b-badge pill variant="success"
+                    v-if="item.tagihan !== null && item.tagihan.status === '2'">
+                      <strong>Lunas</strong>
+                    </b-badge>
+                    <b-badge pill variant="warning"
+                    v-if="item.tagihan !== null && item.tagihan.status === '0'">
+                      <strong>Menunggu Verifikasi Pembayaran</strong>
+                    </b-badge>
+                    <b-badge pill variant="danger"
+                    v-if="item.tagihan !== null && item.tagihan.status === '1'">
+                      <strong>Belum Lunas</strong>
+                    </b-badge>
+                  </h3>
+                </b-col>
+              </b-row>
             </b-col>
             <b-col cols="5">
               <h4>Customer: {{ item.pembeli.nama }}</h4>
@@ -48,6 +68,11 @@
               <h4>Sopir: {{ item.sopir === null ? "-" : item.sopir.nama }}</h4>
             </b-col>
             <b-col>
+              <b-button size="sm" class="btn btn-block btn-sm btn-info" v-if="(item.id_status_orders < 3)"
+              @click="Edit(item.id_orders)">
+                <span class="fa fa-edit"></span> Edit Order
+              </b-button>
+
               <b-button class="btn btn-block btn-sm btn-success" v-b-modal.modal_detail
               @click="Detail(item)">
                 <span class="fa fa-eye"></span> Detail Order
@@ -61,9 +86,6 @@
           </b-row>
           <b-row>
             <b-col>
-              <h3 class="text-info">Total: Rp {{ formatNumber(item.total_bayar) }}</h3>
-            </b-col>
-            <b-col cols="7">
               <b-badge pill :variant="type[item.id_status_orders]">
                 Status: {{ item.status_orders.nama_status_order }}
               </b-badge>
