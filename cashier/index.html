@@ -119,6 +119,9 @@
                         <router-link class="dropdown-item" to="/verify-pembayaran">
                           <i class="fa fa-coins"></i> Verifikasi Pembayaran
                         </router-link>
+                        <router-link class="dropdown-item" to="/verify-kembali-orders">
+                          <i class="fa fa-coins"></i> Verifikasi Pengurangan Order
+                        </router-link>
                       </div>
                   </li>
 
@@ -257,6 +260,7 @@
       { path: "/mutasi-pack", name: "MutasiPack", component: httpVueLoader("MutasiPack.vue")},
       { path: "/mutasi-stok", name: "MutasiStok", component: httpVueLoader("MutasiStok.vue")},
       { path: "/verify-pembayaran", name: "VerifyPembayaran", component: httpVueLoader("VerifyPembayaran.vue")},
+      { path: "/verify-kembali-orders", name: "VerifikasiKembaliOrders", component: httpVueLoader("VerifikasiKembaliOrders.vue")},
       { path: "/customer", name: "Customer", component: httpVueLoader("Customer.vue")},
       { path: "/sopir", name: "Sopir", component: httpVueLoader("Sopir.vue")},
       { path: "/supplier", name: "Supplier", component: httpVueLoader("Supplier.vue")},

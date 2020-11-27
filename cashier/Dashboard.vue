@@ -113,7 +113,7 @@
                   <h4 class="font-weight-bold mb-0">
                     <div v-for="p in kembali_pack">
                       <b-row v-if="p.kembali_pack.length > 0">
-                        <b-col cols="9">{{ p.nama_pack }}</b-col>
+                        <b-col cols="8">{{ p.nama_pack }}</b-col>
                         <b-col>: {{ p.kembali_pack[0].jumlah }} <small>item</small> </b-col>
                       </b-row>
                     </div>
@@ -169,6 +169,36 @@
             </div>
           </div>
 
+          <div class="card card-stats">
+            <div class="card-body">
+              <div class="row">
+                <div class="col">
+                  <h5 class="card-title text-uppercase text-muted mb-0">
+                    Verifikasi Pengurangan Order
+                  </h5>
+                  <h4 class="font-weight-bold mb-0">
+                    <div v-for="b in kembali_orders">
+                      <b-row v-for="ko in b.detail_kembali_orders">
+                        <b-col cols="9">
+                          {{ b.nama_barang }}
+                        </b-col>
+                        <b-col>: {{ ko.jumlah }}
+                          <small>{{ (b.satuan === "1") ? " Kg" : " Butir" }}</small>
+                        </b-col>
+                      </b-row>
+                    </div>
+                  </h4>
+
+                </div>
+                <div class="col-auto">
+                  <div class="icon icon-shape bg-dark text-white rounded-circle shadow">
+                    <i class="ni ni-box-2"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
       </div>
@@ -192,6 +222,7 @@
         pay_verify: 0,
         kembali_pack: 0,
         setor_uang: 0,
+        kembali_orders: [],
       }
     },
 
@@ -220,6 +251,7 @@
           this.total_verify = response.data.total_verify;
           this.kembali_pack = response.data.kembali_pack;
           this.setor_uang = response.data.setor_uang;
+          this.kembali_orders = response.data.kembali_orders;
         })
         .catch(error => {
           console.log(error);

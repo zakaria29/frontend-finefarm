@@ -180,6 +180,45 @@
           </b-row>
 
           <b-row class="mb-1">
+            <b-col>
+              <b-form-checkbox v-model="statusKembaliOrder" @change="toggleKembali">
+               Pengurangan Barang yang di order
+             </b-form-checkbox>
+            </b-col>
+          </b-row>
+
+          <b-row class="mb-2" v-if="statusKembaliOrder">
+            <b-col>
+              <ul class="list-group">
+                <li class="list-group-item">
+                  <b-row>
+                    <b-col cols="6"><small class="text-success"><i>Nama Barang</i></small></b-col>
+                    <b-col cols="3">
+                      <small class="text-info"><i>Jumlah Semula</i></small>
+                    </b-col>
+                    <b-col cols="3">
+                      <small class="text-danger"><i>Dikurangi sejumlah</i></small>
+                    </b-col>
+                  </b-row>
+                </li>
+                <li class="list-group-item" v-for="b in kembaliOrders">
+                  <b-row>
+                    <b-col cols="6">{{ b.nama_barang }}</b-col>
+                    <b-col cols="3">
+                      {{ b.jumlah }}
+                    </b-col>
+                    <b-col cols="3">
+                      <b-form-input type="number" v-model="b.jumlah_barang" :max="b.jumlah"
+                       size="sm">
+                      </b-form-input>
+                    </b-col>
+                  </b-row>
+                </li>
+              </ul>
+            </b-col>
+          </b-row>
+
+          <b-row class="mb-1">
             <b-col cols="5">
               <b-form-checkbox v-model="statusSetorUang"
               @change="toggleUang(selectedOrder.id_orders)">
@@ -192,7 +231,7 @@
           </b-row>
 
 
-          <b-row class="mb-1" v-if="statusSetorUang">
+          <b-row class="mb-2" v-if="statusSetorUang">
             <b-col>
               <b-form-checkbox-group :options="selectedOrder.bill" value-field="id_orders"
                text-field="label" v-model="setorUang">
@@ -208,7 +247,7 @@
             </b-col>
           </b-row>
 
-          <b-row class="mb-1" v-if="kembaliPack.length > 0">
+          <b-row class="mb-2" v-if="kembaliPack.length > 0">
             <b-col>
               <ul class="list-group">
                 <li class="list-group-item" v-for="kp in kembaliPack">
@@ -224,6 +263,8 @@
               </ul>
             </b-col>
           </b-row>
+
+
           <button type="submit" class="btn btn-block btn-dark">
             Order Telah Diterima
           </button>
@@ -279,8 +320,10 @@
         selectedOrder: null,
         setorUang: [],
         kembaliPack: [],
+        kembaliOrders: [],
         statusSetorUang: false,
         statusKembaliPack: false,
+        statusKembaliOrder: false,
       }
     },
 
@@ -310,8 +353,11 @@
         this.selectedOrder = item;
         this.setorUang = [];
         this.kembaliPack = [];
+        this.kembaliOrders = [];
         this.statusSetorUang = false;
         this.statusKembaliPack = false;
+        this.statusKembaliOrder = false;
+        this.detail_orders = item.detail_orders;
       },
 
       togglePack : function(){
@@ -328,6 +374,22 @@
 
         }else{
           this.kembaliPack = [];
+        }
+      },
+
+      toggleKembali : function(){
+        this.statusKembaliOrder = !this.statusKembaliOrder
+        if (this.statusKembaliOrder) {
+          this.detail_orders.forEach((item, i) => {
+            this.kembaliOrders.push({
+              id_barang: item.id_barang,
+              nama_barang: item.barang.nama_barang,
+              jumlah : item.jumlah_barang,
+              jumlah_barang : 0
+            })
+          });
+        } else {
+          this.kembaliOrders = [];
         }
       },
 
@@ -348,10 +410,12 @@
           let conf = { headers: { "Api-Token" : this.key} };
           let id_orders = this.selectedOrder.id_orders;
           let form = new FormData();
+          let detail_kembali_orders = this.kembaliOrders.filter(it => it.jumlah_barang > 0);
           form.append("id_users", this.users.id_users);
           form.append("id_pembeli", this.selectedOrder.id_pembeli);
           form.append("setor_uang", JSON.stringify(this.setorUang));
           form.append("kembali_pack", JSON.stringify(this.kembaliPack));
+          form.append("detail_kembali_orders", JSON.stringify(detail_kembali_orders));
           axios.post(base_url + "/delivered-orders/" + id_orders, form, conf)
           .then(response => {
             this.$bvToast.hide("loading");

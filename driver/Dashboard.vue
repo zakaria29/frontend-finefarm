@@ -86,62 +86,12 @@
               <div class="row">
                 <div class="col">
                   <h5 class="card-title text-uppercase text-muted mb-0">
-                    Uang yang harus disetorkan
-                  </h5>
-                  <span class="h2 font-weight-bold mb-0">
-                    {{ "Rp " + formatNumber(setor_uang) }}
-                  </span>
-                </div>
-                <div class="col-auto">
-                  <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
-                    <i class="fa fa-money-bill-alt"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <div class="col-xl-4 col-md-6">
-          <!-- tanggungan pack -->
-          <div class="card card-stats">
-            <div class="card-body">
-              <div class="row">
-                <div class="col">
-                  <h5 class="card-title text-uppercase text-muted mb-0">
-                    Pack yang harus disetorkan
-                  </h5>
-                  <h4 class="font-weight-bold mb-0">
-                    <div v-for="p in kembali_pack">
-                      <b-row v-if="p.kembali_pack.length > 0">
-                        <b-col cols="9">{{ p.nama_pack }}</b-col>
-                        <b-col>: {{ p.kembali_pack[0].jumlah }} <small>item</small> </b-col>
-                      </b-row>
-                    </div>
-                  </h4>
-
-                </div>
-                <div class="col-auto">
-                  <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
-                    <i class="ni ni-basket"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card card-stats">
-            <div class="card-body">
-              <div class="row">
-                <div class="col">
-                  <h5 class="card-title text-uppercase text-muted mb-0">
                     Barang yang harus disiapkan
                   </h5>
                   <h4 class="font-weight-bold mb-0">
                     <div v-for="b in prepare_barang">
                       <b-row v-for="lg in b.log_get_supplier">
-                        <b-col cols="9">
+                        <b-col cols="8">
                           {{ b.nama_barang }}
                           <small class="text-warning">
                             ({{ lg.supplier.nama_supplier }})
@@ -174,7 +124,7 @@
                   <h4 class="font-weight-bold mb-0">
                     <div v-for="p in prepare_pack">
                       <b-row v-if="p.detail_orders.length > 0">
-                        <b-col cols="9">{{ p.nama_pack }}</b-col>
+                        <b-col cols="8">{{ p.nama_pack }}</b-col>
                         <b-col>: {{ p.detail_orders[0].jumlah }} <small>item</small> </b-col>
                       </b-row>
                     </div>
@@ -184,6 +134,87 @@
                 <div class="col-auto">
                   <div class="icon icon-shape bg-info text-white rounded-circle shadow">
                     <i class="ni ni-basket"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="col-xl-4 col-md-6">
+
+          <div class="card card-stats">
+            <div class="card-body">
+              <div class="row">
+                <div class="col">
+                  <h5 class="card-title text-uppercase text-muted mb-0">
+                    Uang yang harus disetorkan
+                  </h5>
+                  <span class="h2 font-weight-bold mb-0">
+                    {{ "Rp " + formatNumber(setor_uang) }}
+                  </span>
+                </div>
+                <div class="col-auto">
+                  <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
+                    <i class="fa fa-money-bill-alt"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- tanggungan pack -->
+          <div class="card card-stats">
+            <div class="card-body">
+              <div class="row">
+                <div class="col">
+                  <h5 class="card-title text-uppercase text-muted mb-0">
+                    Pack yang harus disetorkan
+                  </h5>
+                  <h4 class="font-weight-bold mb-0">
+                    <div v-for="p in kembali_pack">
+                      <b-row v-if="p.kembali_pack.length > 0">
+                        <b-col cols="8">{{ p.nama_pack }}</b-col>
+                        <b-col>: {{ p.kembali_pack[0].jumlah }} <small>item</small> </b-col>
+                      </b-row>
+                    </div>
+                  </h4>
+
+                </div>
+                <div class="col-auto">
+                  <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
+                    <i class="ni ni-basket"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card card-stats">
+            <div class="card-body">
+              <div class="row">
+                <div class="col">
+                  <h5 class="card-title text-uppercase text-muted mb-0">
+                    Barang yang harus dikembalikan
+                  </h5>
+                  <h4 class="font-weight-bold mb-0">
+                    <div v-for="b in kembali_orders">
+                      <b-row v-for="ko in b.detail_kembali_orders">
+                        <b-col cols="8">
+                          {{ b.nama_barang }}
+                        </b-col>
+                        <b-col>: {{ ko.jumlah }}
+                          <small>{{ (b.satuan === "1") ? " Kg" : " Butir" }}</small>
+                        </b-col>
+                      </b-row>
+                    </div>
+                  </h4>
+
+                </div>
+                <div class="col-auto">
+                  <div class="icon icon-shape bg-dark text-white rounded-circle shadow">
+                    <i class="ni ni-box-2"></i>
                   </div>
                 </div>
               </div>
@@ -213,6 +244,7 @@
         delivered_order: 0,
         prepare_barang: [],
         prepare_pack: [],
+        kembali_orders: [],
       }
     },
 
@@ -241,6 +273,7 @@
           this.delivered_order = response.data.delivered_order;
           this.prepare_pack = response.data.prepare_pack;
           this.prepare_barang = response.data.prepare_barang;
+          this.kembali_orders = response.data.kembali_orders;
         })
         .catch(error => {
           console.log(error);

@@ -107,23 +107,14 @@
                   <li class="nav-item dropdown">
                       <a class="nav-link nav-link-icon" href="#" id="navbar-default_dropdown_1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                           <i class="fa fa-users"></i>
-                          <span class="nav-link-inner--text">User</span>
+                          <span class="nav-link-inner--text">Setoran</span>
                       </a>
                       <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbar-default_dropdown_1">
-                        <router-link class="dropdown-item" to="/owner">
-                          <i class="fa fa-user-tie"></i> Owner
+                        <router-link class="dropdown-item" to="/setoran-pack">
+                          <i class="fa fa-user-tie"></i> Setoran Pack
                         </router-link>
-                        <router-link class="dropdown-item" to="/cashier">
-                          <i class="fa fa-id-card-alt"></i> Cashier
-                        </router-link>
-                        <router-link class="dropdown-item" to="/customer">
-                          <i class="fa fa-users"></i> Customer
-                        </router-link>
-                        <router-link class="dropdown-item" to="/sopir">
-                          <i class="fa fa-truck-pickup"></i> Sopir
-                        </router-link>
-                        <router-link class="dropdown-item" to="/supplier">
-                          <i class="fa fa-people-carry"></i> Supplier
+                        <router-link class="dropdown-item" to="/setoran-uang">
+                          <i class="fa fa-id-card-alt"></i> Setoran Uang
                         </router-link>
                       </div>
                   </li>
@@ -266,6 +257,8 @@
       { path: "/order", name: "Order", component: httpVueLoader("Order.vue")},
       { path: "/deliver", name: "DeliverOrder", component: httpVueLoader("ReadySendOrder.vue")},
       { path: "/delivered", name: "DeliveredOrder", component: httpVueLoader("DeliveredOrder.vue")},
+      { path: "/setoran-pack", name: "SetoranPack", component: httpVueLoader("SetoranPack.vue")},
+      { path: "/setoran-uang", name: "SetoranUang", component: httpVueLoader("SetoranUang.vue")},
       { path: "/edit_order/:id_orders" , name: "EditOrder",
       component: httpVueLoader("EditOrder.vue")},
       { path: "/list_order", name: "ListOrder", component: httpVueLoader("ListOrder.vue")},
