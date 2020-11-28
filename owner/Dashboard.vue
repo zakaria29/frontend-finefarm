@@ -12,7 +12,7 @@
             <div class="card-header">
               <div class="row align-items-center">
                 <div class="col">
-                  <h3 class="mb-0">Profil Cashier</h3>
+                  <h3 class="mb-0">Profil Owner</h3>
                 </div>
               </div>
             </div>
@@ -64,40 +64,24 @@
               <div class="row">
                 <div class="col">
                   <h5 class="card-title text-uppercase text-muted mb-0">
-                    Order yang perlu diverifikasi
+                    Jumlah Pengguna
                   </h5>
-                  <span class="h2 font-weight-bold mb-0">
-                    {{ total_verify }}
-                  </span>
+                  <div v-for="u in pengguna">
+                    <b-row>
+                      <b-col cols="6">{{ u.role }}</b-col>
+                      <b-col>: {{ u.count + " orang" }}</b-col>
+                    </b-row>
+                  </div>
                 </div>
                 <div class="col-auto">
                   <div class="icon icon-shape bg-info text-white rounded-circle shadow">
-                    <i class="ni ni-check-bold"></i>
+                    <i class="fa fa-users"></i>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="card card-stats">
-            <div class="card-body">
-              <div class="row">
-                <div class="col">
-                  <h5 class="card-title text-uppercase text-muted mb-0">
-                    Order yang perlu dikirim
-                  </h5>
-                  <span class="h2 font-weight-bold mb-0">
-                    {{ total_send }}
-                  </span>
-                </div>
-                <div class="col-auto">
-                  <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
-                    <i class="ni ni-delivery-fast"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
 
         </div>
 
@@ -108,13 +92,13 @@
               <div class="row">
                 <div class="col">
                   <h5 class="card-title text-uppercase text-muted mb-0">
-                    Verifikasi Setoran Pack
+                    Harga Barang Terbaru
                   </h5>
                   <h4 class="font-weight-bold mb-0">
-                    <div v-for="p in kembali_pack">
-                      <b-row v-if="p.kembali_pack.length > 0">
-                        <b-col cols="8">{{ p.nama_pack }}</b-col>
-                        <b-col>: {{ p.kembali_pack[0].jumlah }} <small>item</small> </b-col>
+                    <div v-for="b in hargaBarang">
+                      <b-row v-if="b.current_harga !== null">
+                        <b-col cols="6">{{ b.nama_barang }}</b-col>
+                        <b-col>: {{ "Rp " + formatNumber(b.current_harga.harga) }}</b-col>
                       </b-row>
                     </div>
                   </h4>
@@ -134,56 +118,15 @@
               <div class="row">
                 <div class="col">
                   <h5 class="card-title text-uppercase text-muted mb-0">
-                    Pembayaran yang perlu diverifikasi
-                  </h5>
-                  <span class="h2 font-weight-bold mb-0">
-                    {{ "Rp " + formatNumber(pay_verify) }}
-                  </span>
-                </div>
-                <div class="col-auto">
-                  <div class="icon icon-shape bg-cyan text-white rounded-circle shadow">
-                    <i class="ni ni-money-coins"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card card-stats">
-            <div class="card-body">
-              <div class="row">
-                <div class="col">
-                  <h5 class="card-title text-uppercase text-muted mb-0">
-                    Setoran uang yang perlu diverifikasi
-                  </h5>
-                  <span class="h2 font-weight-bold mb-0">
-                    {{ "Rp " + formatNumber(setor_uang) }}
-                  </span>
-                </div>
-                <div class="col-auto">
-                  <div class="icon icon-shape bg-primary text-white rounded-circle shadow">
-                    <i class="fa fa-money-bill-alt"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card card-stats">
-            <div class="card-body">
-              <div class="row">
-                <div class="col">
-                  <h5 class="card-title text-uppercase text-muted mb-0">
-                    Verifikasi Pengurangan Order
+                    Stok Barang
                   </h5>
                   <h4 class="font-weight-bold mb-0">
-                    <div v-for="b in kembali_orders">
-                      <b-row v-for="ko in b.detail_kembali_orders">
-                        <b-col cols="9">
-                          {{ b.nama_barang }}
-                        </b-col>
-                        <b-col>: {{ ko.jumlah }}
-                          <small>{{ (b.satuan === "1") ? " Kg" : " Butir" }}</small>
+                    <div v-for="b in stokBarang">
+                      <b-row v-if="b.stok.length > 0">
+                        <b-col cols="6">{{ b.nama_barang }}</b-col>
+                        <b-col>
+                          : {{ b.stok[0].stok }}
+                          <small>{{ b.satuan === "1" ? " Kg" : " Butir" }}</small>
                         </b-col>
                       </b-row>
                     </div>
@@ -191,8 +134,8 @@
 
                 </div>
                 <div class="col-auto">
-                  <div class="icon icon-shape bg-dark text-white rounded-circle shadow">
-                    <i class="ni ni-box-2"></i>
+                  <div class="icon icon-shape bg-success text-white rounded-circle shadow">
+                    <i class="ni ni-basket"></i>
                   </div>
                 </div>
               </div>
@@ -223,6 +166,10 @@
         kembali_pack: 0,
         setor_uang: 0,
         kembali_orders: [],
+
+        hargaBarang: [],
+        stokBarang: [],
+        pengguna: [],
       }
     },
 
@@ -242,16 +189,13 @@
         let token = this.$cookies.get("Api-Token");
         let form = new FormData();
         form.append("token",token);
-        axios.post(base_url+"/cashier/dashboard", form)
+        axios.post(base_url+"/owner/dashboard", form)
         .then(response => {
           this.users = response.data.users;
           this.total_orders = response.data.total_orders;
-          this.pay_verify = response.data.pay_verify;
-          this.total_send = response.data.total_send;
-          this.total_verify = response.data.total_verify;
-          this.kembali_pack = response.data.kembali_pack;
-          this.setor_uang = response.data.setor_uang;
-          this.kembali_orders = response.data.kembali_orders;
+          this.hargaBarang = response.data.harga_barang;
+          this.stokBarang = response.data.stok_barang;
+          this.pengguna = response.data.pengguna;
         })
         .catch(error => {
           console.log(error);

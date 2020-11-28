@@ -6,31 +6,6 @@
       </h3>
     </div>
     <div class="card-body">
-      <!-- <form v-on:submit.prevent="find">
-        <div class="row mb-2">
-          <div class="col-2">
-            Start Date
-             <b-form-input v-model="from" type="date" required>
-             </b-form-input>
-          </div>
-          <div class="col-2">
-            End Date
-             <b-form-input v-model="to" type="date" required>
-             </b-form-input>
-          </div>
-          <div class="col-6">
-            Pencarian
-             <b-form-input v-model="search" type="text" placeholder="Kata Kunci">
-             </b-form-input>
-          </div>
-          <div class="col-2">
-            <br />
-            <b-button type="submit" class="btn btn-info">
-              <span class="fa fa-search"></span> Cari
-            </b-button>
-          </div>
-        </div>
-      </form> -->
       <b-form-input v-model="search" @keyup.enter="find(users.id_users)"
       placeholder="Pencarian...">
       </b-form-input>
@@ -68,7 +43,7 @@
               <h4>Sopir: {{ item.sopir === null ? "-" : item.sopir.nama }}</h4>
             </b-col>
             <b-col>
-              <b-button size="sm" class="btn btn-block btn-sm btn-info" v-if="(item.id_status_orders < 3)"
+              <b-button size="sm" class="btn btn-block btn-sm btn-info" v-if="(item.id_status_orders < 2)"
               @click="Edit(item.id_orders)">
                 <span class="fa fa-edit"></span> Edit Order
               </b-button>

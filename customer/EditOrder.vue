@@ -198,6 +198,7 @@
         margin_group: 0,
         driver: [],
         barang: [],
+        tempBarang: [],
         customer: [],
         detail_order: [],
         orders: {
@@ -217,6 +218,7 @@
           catatan: "",
         },
         dp: false,
+        users_lock: false,
       }
     },
 
@@ -235,6 +237,7 @@
           harga_pack: "",
           jumlah_pack: 0,
           beli_pack : 0,
+          is_lock: this.users_lock
         });
       },
 
@@ -243,6 +246,11 @@
         this.detail_order[index].pack = item.pack;
         this.detail_order[index].harga_beli =
         Number(this.margin) + Number(item.harga) + Number(this.margin_group);
+        if (this.users_lock) {
+          if (this.detail_order[index].is_lock) {
+            this.detail_order[index].harga_beli = Number(item.harga_lock);
+          }
+        }
         this.detail_order[index].id_pack = item.pack[0].id_pack;
       },
 
@@ -313,6 +321,8 @@
         axios.get(base_url + "/barang", conf)
         .then(response => {
           this.barang = response.data.barang;
+          this.tempBarang = response.data.barang;
+          this.initUser();
         })
         .catch(error => {
           alert(error);
@@ -365,10 +375,10 @@
           this.margin_group = response.data.orders.margin_group;
           this.detail_order = response.data.orders.detail_orders;
           this.orders.id_users =  response.data.orders.id_users === "" ?
-          "" : this.users.id_users;
+          "" : response.data.orders.id_users;
           this.orders.id_pembeli =  response.data.orders.id_pembeli;
           this.orders.id_sopir =  response.data.orders.id_sopir === "" ?
-          "" : this.users.id_sopir;
+          "" : response.data.orders.id_sopir;
 
           this.orders.waktu_pengiriman =  response.data.orders.waktu_pengiriman;
           this.orders.tgl_jatuh_tempo =  response.data.orders.tgl_jatuh_tempo;
@@ -405,8 +415,26 @@
           } else{
             this.key = token;
             this.users = response.data.customer;
-            this.get_barang();
+            this.orders.id_pembeli = response.data.customer.id_users;
+            this.jatuh_tempo = response.data.customer.jatuh_tempo;
+            this.margin = response.data.customer.margin;
+            this.margin_group = response.data.customer.group_customer.margin;
+            // this.get_barang();
             this.get_order();
+
+            if(response.data.customer.lock_pack_barang.length > 0){
+              this.barang = [];
+              let brg = null;
+              response.data.customer.lock_pack_barang.forEach((it, i) => {
+                brg = this.tempBarang.find(itm => itm.id_barang === it.id_barang);
+                brg.harga_lock = it.harga;
+                this.barang.push(brg);
+              });
+              this.users_lock = true;
+            }else{
+              this.barang = this.tempBarang;
+              this.users_lock = false;
+            }
 
           }
         })
@@ -419,7 +447,7 @@
 
     mounted(){
       this.orders.id_orders = this.$route.params.id_orders;
-      this.initUser();
+      this.get_barang();
     }
   }
 </script>

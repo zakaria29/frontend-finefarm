@@ -2,7 +2,7 @@
   <div class="card">
     <div class="card-header">
       <h3>
-        <span class="fa fa-list"></span> Data Setoran Pack
+        <span class="fa fa-list"></span> Data Setoran Uang
       </h3>
     </div>
     <div class="card-body">

@@ -44,7 +44,7 @@
             Waktu Pengiriman
           </div>
           <div class="col-3">
-            <input type="date" v-model="orders.waktu_pengiriman"
+            <input type="date" v-model="orders.waktu_pengiriman" @change="setJatuhTempo()"
             class="form-control" required />
           </div>
           <div class="col-2">
@@ -135,8 +135,14 @@
                 </div>
 
                 <div class="col-3">
-                  Harga <br />
+                  Harga {{ d.is_lock ? "Lock" : "Saat Ini" }}
+                  <br />
                   {{ "Rp " + formatNumber(d.harga_beli) }}
+                 <b-button block size="sm" :variant="d.is_lock ? 'primary' : 'success'"
+                  v-if="users_lock"
+                 @click="() => {d.is_lock = !d.is_lock; SelectBarang(d.id_barang, index)}">
+                   {{ d.is_lock ? "Pakai Harga Saat ini" : "Pakai Harga Lock" }}
+                 </b-button>
                 </div>
 
                 <div class="col-4">
@@ -235,6 +241,7 @@
         margin_group: 0,
         driver: [],
         barang: [],
+        tempBarang: [],
         customer: [],
         detail_order: [],
         orders: {
@@ -254,6 +261,7 @@
           catatan: "",
         },
         dp: false,
+        users_lock : false,
       }
     },
 
@@ -272,14 +280,22 @@
           harga_pack: "",
           jumlah_pack: 0,
           beli_pack : 0,
+          is_lock: this.users_lock,
         });
       },
 
       SelectBarang : function(id,index){
         let item = this.barang.find(it => it.id_barang === id);
         this.detail_order[index].pack = item.pack;
+        this.detail_order[index].satuan = item.satuan === "1" ? "Kg" : "Butir";
+
         this.detail_order[index].harga_beli =
         Number(this.margin) + Number(item.harga) + Number(this.margin_group);
+        if (this.users_lock) {
+          if (this.detail_order[index].is_lock) {
+            this.detail_order[index].harga_beli = Number(item.harga_lock);
+          }
+        }
         this.detail_order[index].id_pack = item.pack[0].id_pack;
       },
 
@@ -313,6 +329,21 @@
         let item = this.customer.find(it => it.id_users === this.orders.id_pembeli);
         this.margin = item.margin;
         this.margin_group = item.margin_group;
+        // this.detail_order = [];
+
+        if(item.lock_pack_barang.length > 0){
+          this.barang = [];
+          let brg = null;
+          item.lock_pack_barang.forEach((it, i) => {
+            brg = this.tempBarang.find(itm => itm.id_barang === it.id_barang);
+            brg.harga_lock = it.harga;
+            this.barang.push(brg);
+          });
+          this.users_lock = true;
+        }else{
+          this.barang = this.tempBarang;
+          this.users_lock = false;
+        }
       },
 
       CountTotal : function(){
@@ -338,6 +369,7 @@
         axios.get(base_url + "/customer", conf)
         .then(response => {
           this.customer = response.data.customer;
+          this.get_driver();
         })
         .catch(error => {
           alert(error);
@@ -349,6 +381,8 @@
         axios.get(base_url + "/barang", conf)
         .then(response => {
           this.barang = response.data.barang;
+          this.tempBarang = response.data.barang;
+          this.get_customer();
         })
         .catch(error => {
           alert(error);
@@ -397,10 +431,19 @@
         axios.get(base_url + "/driver", conf)
         .then(response => {
           this.driver = response.data.driver;
+          this.Customer();
         })
         .catch(error => {
           alert(error);
         })
+      },
+
+      setJatuhTempo : function(){
+        let send = new Date(this.orders.waktu_pengiriman)
+        // console.log(this.jatuh_tempo);
+        send.setDate(Number(send.getDate()) + Number(this.jatuh_tempo))
+        this.orders.tgl_jatuh_tempo = send.toISOString().slice(0,10);;
+        // console.log(this.orders.tgl_jatuh_tempo);
       },
 
       get_order : function(){
@@ -434,6 +477,8 @@
           // this.supply.time = currentTime;
           this.orders.time_order = (date.getHours() < 10 ? "0"+date.getHours() : date.getHours())
           + ":" + (date.getMinutes() < 10 ? "0"+date.getMinutes() : date.getMinutes());
+
+          this.get_barang();
         })
         .catch(error => {
           alert(error);
@@ -451,11 +496,7 @@
           } else{
             this.key = token;
             this.users = response.data.cashier;
-            this.get_driver();
-            this.get_customer();
-            this.get_barang();
             this.get_order();
-
           }
         })
         .catch(error => {

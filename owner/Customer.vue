@@ -20,6 +20,10 @@
           <b-button class="btn btn-sm btn-danger" @click="Drop(data.item.id_users)">
             <span class="fa fa-trash"></span>
           </b-button>
+          <b-button class="btn btn-sm btn-warning" @click="Lock(data.item)"
+          v-b-modal.modal_lock>
+            <span class="fa fa-unlock-alt"></span> Lock Barang
+          </b-button>
         </template>
         <template v-slot:cell(nama)="data">
           <img :src="storage_path + data.item.image"
@@ -56,8 +60,77 @@
       <span class="fa fa-spinner fa-spin"></span>
       <strong class="text-success">Loading...</strong>
     </b-toast>
-
     <!-- Modal Component -->
+    <b-modal id="modal_lock" title="Lock Barang dan Pack"
+    header-bg-variant="info" size="lg"
+    border-variant="info" hide-footer>
+      <b-container fluid>
+        <b-row class="mb-2">
+          <b-col cols="3">Customer</b-col>
+          <b-col>: {{ users.nama }}</b-col>
+        </b-row>
+        <form v-on:submit.prevent="SaveLock">
+          <b-row>
+            <b-col>
+              Lock Pack, Barang, dan Harga
+              <ul class="list-group">
+                <li class="list-group-item">
+                  <b-row class="mb-1">
+                    <b-col cols="3">
+                      <strong> <small>Barang</small> </strong>
+                    </b-col>
+                    <b-col cols="3">
+                      <strong> <small>Pack</small> </strong>
+                    </b-col>
+                    <b-col cols="4">
+                      <strong> <small>Harga</small> </strong>
+                    </b-col>
+                    <b-col cols="2">
+                      <b-button size="sm" variant="success" @click="addLock">
+                        <span class="fa fa-plus"></span>
+                      </b-button>
+                    </b-col>
+                  </b-row>
+                </li>
+
+                <li class="list-group-item" v-for="(s,i) in selectedLockPackBarang">
+                  <b-row class="mb-1">
+                    <b-col cols="3">
+                      <b-form-select size="sm" v-model="s.id_barang" @change="bindBarang(i)"
+                      required>
+                        <option v-for="b in barang" :value="b.id_barang">
+                          {{ b.nama_barang }}
+                        </option>
+                      </b-form-select>
+                    </b-col>
+                    <b-col cols="3">
+                      <b-form-select size="sm" v-model="s.id_pack" required>
+                        <option v-for="p in s.pack" :value="p.id_pack">
+                          {{ p.nama_pack }}
+                        </option>
+                      </b-form-select>
+                    </b-col>
+                    <b-col cols="4">
+                      <b-form-input v-model="s.harga" type="number" size="sm" required>
+                      </b-form-input>
+                    </b-col>
+                    <b-col cols="2">
+                      <b-button size="sm" variant="danger" @click="dropLock(i)">
+                        <span class="fa fa-trash"></span>
+                      </b-button>
+                    </b-col>
+                  </b-row>
+                </li>
+              </ul>
+
+              <b-button block type="submit" variant="primary">
+                Simpan
+              </b-button>
+            </b-col>
+          </b-row>
+        </form>
+      </b-container>
+    </b-modal>
  <b-modal
      id="modal_user"
      title="Form Customer"
@@ -151,7 +224,9 @@
         totalRow: 0,
         perPage: 10,
         currentPage: 1,
-        key: ""
+        key: "",
+        selectedLockPackBarang: [],
+        barang: [],
       }
     },
 
@@ -166,6 +241,71 @@
           console.log(error);
         });
       },
+
+      get_barang : function() {
+        let conf = { headers: { "Api-Token" : this.key} };
+        axios.get(base_url+"/barang", conf)
+        .then(response => {
+          this.barang = response.data.barang;
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      },
+
+      Lock : function(items){
+        this.users.id_users = items.id_users;
+        this.users.nama = items.nama;
+        this.selectedLockPackBarang = [];
+        items.lock_pack_barang.forEach((item, i) => {
+          let selectedBarang = this.barang.find(it => it.id_barang === item.id_barang);
+          this.selectedLockPackBarang.push({
+            pack: selectedBarang.pack,
+            id_barang: item.id_barang,
+            id_pack: item.id_pack,
+            harga: item.harga
+          })
+        });
+      },
+
+      bindBarang : function(index){
+        let id = this.selectedLockPackBarang[index].id_barang;
+        let selectedBarang = this.barang.find(it => it.id_barang === id);
+        this.selectedLockPackBarang[index].pack = selectedBarang.pack;
+      },
+
+      addLock : function(){
+        this.selectedLockPackBarang.push({
+          pack: [],
+          id_barang: "",
+          id_pack: "",
+          harga: 0
+        })
+      },
+
+      dropLock : function(index){
+        this.selectedLockPackBarang.splice(index,1);
+      },
+
+      SaveLock : function(){
+        let conf = { headers: { "Api-Token" : this.key} };
+        this.$bvModal.hide("modal_lock");
+        this.$bvToast.show("loading");
+        let form = new FormData();
+        form.append("id_users", this.users.id_users);
+        form.append("lock_pack_barang", JSON.stringify(this.selectedLockPackBarang));
+        axios.post(base_url+"/lock-pack-barang", form, conf)
+        .then(response => {
+          this.$bvToast.hide("loading");
+          this.message = response.data.message;
+          this.$bvToast.show("message");
+          this.find();
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      },
+
       get_users : function() {
         let conf = { headers: { "Api-Token" : this.key} };
         let offset = (this.currentPage-1) * this.perPage;
@@ -175,6 +315,7 @@
           this.$bvToast.hide("loading");
           this.user = response.data.customer;
           this.totalRow = response.data.count;
+          this.get_barang();
         })
         .catch(error => {
           console.log(error);

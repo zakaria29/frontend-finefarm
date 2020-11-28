@@ -137,8 +137,14 @@
                 </div>
 
                 <div class="col-3">
-                  Harga <br />
+                  Harga {{ d.is_lock ? "Lock" : "Saat Ini" }}
+                  <br />
                   {{ "Rp " + formatNumber(d.harga_beli) }}
+                 <b-button block size="sm" :variant="d.is_lock ? 'primary' : 'success'"
+                  v-if="users_lock"
+                 @click="() => {d.is_lock = !d.is_lock; SelectBarang(d.id_barang, index)}">
+                   {{ d.is_lock ? "Pakai Harga Saat ini" : "Pakai Harga Lock" }}
+                 </b-button>
                 </div>
 
                 <div class="col-4">
@@ -236,6 +242,7 @@
         margin: 0,
         margin_group: 0,
         barang: [],
+        tempBarang: [],
         driver: [],
         customer: [],
         detail_order: [],
@@ -253,10 +260,12 @@
           po: "",
           invoice: "",
           catatan: "",
-          id_sopir: "",
+          id_sopir: ""
         },
         dp: false,
         jatuh_tempo: 0,
+        users_lock: false,
+
       }
     },
 
@@ -275,7 +284,8 @@
           harga_pack: "",
           jumlah_pack: 0,
           beli_pack : 0,
-          satuan: ""
+          satuan: "",
+          is_lock: this.users_lock,
         });
       },
 
@@ -283,8 +293,14 @@
         let item = this.barang.find(it => it.id_barang === id);
         this.detail_order[index].pack = item.pack;
         this.detail_order[index].satuan = item.satuan === "1" ? "Kg" : "Butir";
+
         this.detail_order[index].harga_beli =
         Number(this.margin) + Number(item.harga) + Number(this.margin_group);
+        if (this.users_lock) {
+          if (this.detail_order[index].is_lock) {
+            this.detail_order[index].harga_beli = Number(item.harga_lock);
+          }
+        }
         this.detail_order[index].id_pack = item.pack[0].id_pack;
       },
 
@@ -320,6 +336,7 @@
         this.margin = item.margin;
         this.margin_group = item.margin_group;
         this.jatuh_tempo = item.jatuh_tempo;
+        this.detail_order = [];
         if (this.orders.waktu_pengiriman !== "") {
           let send = new Date(this.orders.waktu_pengiriman)
           send.setDate(Number(send.getDate()) + Number(this.jatuh_tempo))
@@ -339,6 +356,21 @@
         let d = new Date();
         this.orders.invoice = d.getFullYear().toString() + (d.getMonth()+1).toString() +
         d.getDate().toString() +  initials + urutan;
+
+        if(item.lock_pack_barang.length > 0){
+          this.barang = [];
+          let brg = null;
+          item.lock_pack_barang.forEach((it, i) => {
+            brg = this.tempBarang.find(itm => itm.id_barang === it.id_barang);
+            brg.harga_lock = it.harga;
+            this.barang.push(brg);
+          });
+          this.users_lock = true;
+        }else{
+          this.barang = this.tempBarang;
+          this.users_lock = false;
+        }
+
       },
 
       setJatuhTempo : function(){
@@ -372,6 +404,7 @@
         axios.get(base_url + "/customer", conf)
         .then(response => {
           this.customer = response.data.customer;
+          this.get_driver();
         })
         .catch(error => {
           alert(error);
@@ -383,6 +416,8 @@
         axios.get(base_url + "/barang", conf)
         .then(response => {
           this.barang = response.data.barang;
+          this.tempBarang = response.data.barang;
+          this.get_customer();
         })
         .catch(error => {
           alert(error);
@@ -446,11 +481,9 @@
           if (response.data.auth == false) {
             window.location = "login.html";
           } else{
-            this.users = response.data.owner;
+            this.users = response.data.cashier;
             this.orders.id_users = response.data.owner.id_users;
             this.get_barang();
-            this.get_customer();
-            this.get_driver();
           }
         })
         .catch(error => {
