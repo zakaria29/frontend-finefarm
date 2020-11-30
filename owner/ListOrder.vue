@@ -4,8 +4,10 @@
       <h3>
         <span class="fa fa-list"></span> Data Order
       </h3>
+
     </div>
     <div class="card-body">
+      <h4>Filter Data</h4>
       <form v-on:submit.prevent="find">
         <div class="row mb-2">
           <div class="col-2">
@@ -31,7 +33,37 @@
           </div>
         </div>
       </form>
+      <hr />
 
+
+      <b-row id="summary" class="mt-2">
+        <b-col>
+          <h4 class="mt-2">Summary</h4>
+          <b-row>
+            <b-col cols="3">Modal</b-col>
+            <b-col cols="9">: {{ "Rp " + formatNumber(summary.modal) }}</b-col>
+            <b-col cols="3">Total Orders</b-col>
+            <b-col cols="9">: {{ "Rp " + formatNumber(summary.totalOrders) }}</b-col>
+            <b-col cols="3">Cash</b-col>
+            <b-col cols="9">: {{ "Rp " + formatNumber(summary.cash) }}</b-col>
+            <b-col cols="3">Piutang</b-col>
+            <b-col cols="9">: {{ "Rp " + formatNumber(summary.piutang) }}</b-col>
+          </b-row>
+        </b-col>
+        <b-col>
+          <h4 class="mt-2">Produk yang terjual</h4>
+          <b-row v-for="b in summary.barang">
+            <b-col v-if="b.log_stok_barang.length > 0">{{ b.nama_barang }}</b-col>
+            <b-col v-if="b.log_stok_barang.length > 0">
+              : {{ b.log_stok_barang[0].jumlah + " " }}
+              {{ (b.satuan === "1") ? "Kg" : "Butir" }}
+            </b-col>
+          </b-row>
+        </b-col>
+      </b-row>
+      <hr />
+
+      <h4 class="mt-2">List Order</h4>
       <ul class="list-group mt-2">
         <li class="list-group-item mb-2" v-for="item in orders">
           <b-row>
@@ -39,6 +71,26 @@
               <h4>ID Order: {{ item.id_orders }}</h4>
               <h4>Waktu Order: {{ formatDateTime(item.waktu_order) }}</h4>
               <h4>Waktu Kirim: {{ formatDate(item.waktu_pengiriman) }}</h4>
+              <b-row>
+                <b-col>
+                  <h3 class="text-info">
+                    Total: Rp {{ formatNumber(item.total_bayar) }}
+
+                    <b-badge pill variant="success"
+                    v-if="item.tagihan !== null && item.tagihan.status === '2'">
+                      <strong>Lunas</strong>
+                    </b-badge>
+                    <b-badge pill variant="warning"
+                    v-if="item.tagihan !== null && item.tagihan.status === '0'">
+                      <strong>Menunggu Verifikasi Pembayaran</strong>
+                    </b-badge>
+                    <b-badge pill variant="danger"
+                    v-if="item.tagihan !== null && item.tagihan.status === '1'">
+                      <strong>Belum Lunas</strong>
+                    </b-badge>
+                  </h3>
+                </b-col>
+              </b-row>
             </b-col>
             <b-col cols="5">
               <h4>Customer: {{ item.pembeli.nama }}</h4>
@@ -46,27 +98,30 @@
               <h4>Sopir: {{ item.sopir === null ? "-" : item.sopir.nama }}</h4>
             </b-col>
             <b-col>
-              <b-button class="btn btn-block btn-sm btn-info" v-if="(item.id_status_orders < 3)"
+              <b-button size="sm" class="btn btn-block btn-sm btn-info" v-if="(item.id_status_orders < 3)"
               @click="Edit(item.id_orders)">
                 <span class="fa fa-edit"></span> Edit Order
               </b-button>
 
-              <b-button class="btn btn-block btn-sm btn-success" v-b-modal.modal_detail
+              <b-button size="sm" class="btn btn-block btn-sm btn-success" v-b-modal.modal_detail
               @click="Detail(item)">
                 <span class="fa fa-eye"></span> Detail Order
               </b-button>
 
-              <b-button class="btn btn-block btn-sm btn-warning" v-b-modal.modal_log
+              <b-button size="sm" class="btn btn-block btn-sm btn-warning" v-b-modal.modal_log
               @click="LogOrder(item)">
                 <span class="fa fa-history"></span> Log Order
+              </b-button>
+
+              <b-button size="sm" class="btn btn-block btn-sm btn-dark"
+              @click="Print(item)">
+                <span class="fa fa-print"></span> Struk Order
               </b-button>
             </b-col>
           </b-row>
           <b-row>
+
             <b-col>
-              <h3 class="text-info">Total: Rp {{ formatNumber(item.total_bayar) }}</h3>
-            </b-col>
-            <b-col cols="7">
               <b-badge pill :variant="type[item.id_status_orders]">
                 Status: {{ item.status_orders.nama_status_order }}
               </b-badge>
@@ -157,7 +212,7 @@
       border-variant="info" hide-footer>
 
       <ul class="timeline">
-        <li v-for="l in log_orders">
+        <li style="border-radius:5px;" class="bg-lighter p-2 m-2" v-for="l in log_orders">
 					<span class="text-default">{{ l.nama }}</span>
 					<span class="text-warning float-right">
             <small>{{ formatDateTime(l.waktu) }}</small>
@@ -165,6 +220,9 @@
 					<p>
             {{ l.status_orders.nama_status_order }}
           </p>
+          <b-badge pill class="bg-blue text-white">
+            <strong> <i>Oleh: {{ l.users.nama }}</i> </strong>
+          </b-badge>
 				</li>
       </ul>
     </b-modal>
@@ -196,10 +254,20 @@
           tgl_jatuh_tempo: "",
           total_bayar: 0,
         },
+        summary: {
+          totalOrders: 0,
+          modal: 0,
+          cash: 0,
+          piutang: 0,
+          barang: []
+        },
+
       }
     },
 
     methods: {
+
+
       Edit : function(id){
         this.$router.push({ name: "EditOrder", params: { id_orders: id }});
 
@@ -220,6 +288,10 @@
         this.log_orders = item.log_orders;
       },
 
+      Print : function(item){
+        window.open(base_url + "/struk/" + item.id_orders,'_blank');
+      },
+
       find : function(){
         let conf = { headers: { "Api-Token" : this.key} };
         let form = new FormData();
@@ -234,7 +306,19 @@
           this.totalRow = response.data.count;
         })
         .catch(error => {
-          alert(error);
+          console.log(error);
+        })
+
+        axios.post(base_url + "/summary-orders", form, conf)
+        .then(response => {
+          this.summary.totalOrders = response.data.total_orders;
+          this.summary.cash = response.data.cash;
+          this.summary.modal = response.data.modal;
+          this.summary.piutang = response.data.piutang;
+          this.summary.barang = response.data.barang;
+        })
+        .catch(error => {
+          console.log(error);
         })
       }
     },
