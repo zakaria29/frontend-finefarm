@@ -304,22 +304,25 @@
         .then(response => {
           this.orders = response.data.orders;
           this.totalRow = response.data.count;
+
+          axios.post(base_url + "/summary-orders", form, conf)
+          .then(response => {
+            this.summary.totalOrders = response.data.total_orders;
+            this.summary.cash = response.data.cash;
+            this.summary.modal = response.data.modal;
+            this.summary.piutang = response.data.piutang;
+            this.summary.barang = response.data.barang;
+          })
+          .catch(error => {
+            console.log(error);
+          })
+          
         })
         .catch(error => {
           console.log(error);
         })
 
-        axios.post(base_url + "/summary-orders", form, conf)
-        .then(response => {
-          this.summary.totalOrders = response.data.total_orders;
-          this.summary.cash = response.data.cash;
-          this.summary.modal = response.data.modal;
-          this.summary.piutang = response.data.piutang;
-          this.summary.barang = response.data.barang;
-        })
-        .catch(error => {
-          console.log(error);
-        })
+
       }
     },
 

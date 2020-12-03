@@ -112,7 +112,7 @@
                   </h5>
                   <h4 class="font-weight-bold mb-0">
                     <b-row v-for="p in users.tanggungan_pack">
-                      <b-col cols="9">{{ p.pack.nama_pack }}</b-col>
+                      <b-col cols="7">{{ p.pack.nama_pack }}</b-col>
                       <b-col>: {{ p.jumlah }} <small>item</small> </b-col>
                     </b-row>
                   </h4>

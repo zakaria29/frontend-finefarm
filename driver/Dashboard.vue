@@ -45,39 +45,43 @@
         <div class="col-xl-4 col-md-6">
           <div class="card card-stats">
             <div class="card-body">
-              <div class="row">
-                <div class="col">
-                  <h5 class="card-title text-uppercase text-muted mb-0">
-                    Order yang akan dikirim
-                  </h5>
-                  <span class="h2 font-weight-bold mb-0">{{ kirim_order }}</span>
-                </div>
-                <div class="col-auto">
-                  <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
-                    <i class="ni ni-delivery-fast"></i>
+              <router-link to="/deliver">
+                <div class="row">
+                  <div class="col">
+                    <h5 class="card-title text-uppercase text-muted mb-0">
+                      Order yang akan dikirim
+                    </h5>
+                    <span class="h2 font-weight-bold mb-0">{{ kirim_order }}</span>
+                  </div>
+                  <div class="col-auto">
+                    <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
+                      <i class="ni ni-delivery-fast"></i>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </router-link>
             </div>
           </div>
 
           <div class="card card-stats">
             <div class="card-body">
-              <div class="row">
-                <div class="col">
-                  <h5 class="card-title text-uppercase text-muted mb-0">
-                    Penerimaan Order
-                  </h5>
-                  <span class="h2 font-weight-bold mb-0">
-                    {{ delivered_order }}
-                  </span>
-                </div>
-                <div class="col-auto">
-                  <div class="icon icon-shape bg-success text-white rounded-circle shadow">
-                    <i class="fa fa-people-carry"></i>
+              <router-link to="/delivered">
+                <div class="row">
+                  <div class="col">
+                    <h5 class="card-title text-uppercase text-muted mb-0">
+                      Penerimaan Order
+                    </h5>
+                    <span class="h2 font-weight-bold mb-0">
+                      {{ delivered_order }}
+                    </span>
+                  </div>
+                  <div class="col-auto">
+                    <div class="icon icon-shape bg-success text-white rounded-circle shadow">
+                      <i class="fa fa-people-carry"></i>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </router-link>
             </div>
           </div>
 
@@ -146,48 +150,52 @@
 
           <div class="card card-stats">
             <div class="card-body">
-              <div class="row">
-                <div class="col">
-                  <h5 class="card-title text-uppercase text-muted mb-0">
-                    Uang yang harus disetorkan
-                  </h5>
-                  <span class="h2 font-weight-bold mb-0">
-                    {{ "Rp " + formatNumber(setor_uang) }}
-                  </span>
-                </div>
-                <div class="col-auto">
-                  <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
-                    <i class="fa fa-money-bill-alt"></i>
+              <router-link to="/setoran-uang">
+                <div class="row">
+                  <div class="col">
+                    <h5 class="card-title text-uppercase text-muted mb-0">
+                      Uang yang harus disetorkan
+                    </h5>
+                    <span class="h2 font-weight-bold mb-0">
+                      {{ "Rp " + formatNumber(setor_uang) }}
+                    </span>
+                  </div>
+                  <div class="col-auto">
+                    <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
+                      <i class="fa fa-money-bill-alt"></i>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </router-link>
             </div>
           </div>
 
           <!-- tanggungan pack -->
           <div class="card card-stats">
             <div class="card-body">
-              <div class="row">
-                <div class="col">
-                  <h5 class="card-title text-uppercase text-muted mb-0">
-                    Pack yang harus disetorkan
-                  </h5>
-                  <h4 class="font-weight-bold mb-0">
-                    <div v-for="p in kembali_pack">
-                      <b-row v-if="p.kembali_pack.length > 0">
-                        <b-col cols="8">{{ p.nama_pack }}</b-col>
-                        <b-col>: {{ p.kembali_pack[0].jumlah }} <small>item</small> </b-col>
-                      </b-row>
-                    </div>
-                  </h4>
+              <router-link to="/setoran-pack">
+                <div class="row">
+                  <div class="col">
+                    <h5 class="card-title text-uppercase text-muted mb-0">
+                      Pack yang harus disetorkan
+                    </h5>
+                    <h4 class="font-weight-bold mb-0">
+                      <div v-for="p in kembali_pack">
+                        <b-row v-if="p.kembali_pack.length > 0">
+                          <b-col cols="8">{{ p.nama_pack }}</b-col>
+                          <b-col>: {{ p.kembali_pack[0].jumlah }} <small>item</small> </b-col>
+                        </b-row>
+                      </div>
+                    </h4>
 
-                </div>
-                <div class="col-auto">
-                  <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
-                    <i class="ni ni-basket"></i>
+                  </div>
+                  <div class="col-auto">
+                    <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
+                      <i class="ni ni-basket"></i>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </router-link>
             </div>
           </div>
 

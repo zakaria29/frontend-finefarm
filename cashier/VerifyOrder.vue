@@ -212,6 +212,54 @@
               </v-select>
             </b-col>
           </b-row>
+
+          <b-row class="my-2">
+            <b-col>
+              <ul class="list-group">
+                <li class="list-group-item text-bold">
+                  <b-row>
+                    <b-col cols="4">Items</b-col>
+                    <b-col cols="2">Qty</b-col>
+                    <b-col cols="3">Harga Satuan</b-col>
+                    <b-col cols="3">Total</b-col>
+                  </b-row>
+                </li>
+                <li class="list-group-item" v-for="(item, index) in selected.detail_orders">
+                  <b-row>
+                    <b-col cols="4">{{ item.barang.nama_barang }}</b-col>
+                    <b-col cols="2">
+                      {{ item.jumlah_barang }}
+                      <small>{{ (item.barang.satuan === "1") ? " Kg" : " Butir" }}</small>
+                    </b-col>
+                    <b-col cols="3">
+                      {{ formatNumber(item.harga_beli) }}
+                      <a type="button" class="text-warning"
+                      v-if="item.status_harga_order === true" @click="changeHarga(index, true)">
+                        <small>Gunakan Harga Terbaru</small>
+                      </a>
+                      <a type="button" class="text-success"
+                      v-else @click="changeHarga(index, false)">
+                        <small>Gunakan Harga Order</small>
+                      </a>
+                    </b-col>
+                    <b-col cols="3">
+                      {{ formatNumber(item.jumlah_barang * item.harga_beli) }}
+                    </b-col>
+                  </b-row>
+                  <b-row>
+                    <b-col cols="4">{{ item.pack.nama_pack }}</b-col>
+                    <b-col cols="2">{{ item.jumlah_pack }}</b-col>
+                    <b-col cols="3">
+                      {{ formatNumber(item.harga_pack) }}
+                    </b-col>
+                    <b-col cols="3">
+                      {{ formatNumber(item.jumlah_pack * item.harga_pack) }}
+                    </b-col>
+                  </b-row>
+                </li>
+              </ul>
+            </b-col>
+          </b-row>
           <button type="submit" class="btn btn-sm btn-info btn-block">
             Accept Order
           </button>
@@ -254,11 +302,30 @@
           total_bayar: null,
           customer: null,
           id_orders: null,
+          detail_orders: []
         }
       }
     },
 
     methods: {
+      changeHarga : function(index, status){
+        if(status){
+          let harga = this.selected.detail_orders[index].current_harga;
+          this.selected.detail_orders[index].harga_beli = harga;
+          this.selected.detail_orders[index].status_harga_order = false;
+          if (this.selected.detail_orders[index].original_is_lock) {
+            this.selected.detail_orders[index].is_lock = false;
+          }
+        }
+        else{
+          let harga = this.selected.detail_orders[index].harga_order;
+          this.selected.detail_orders[index].harga_beli = harga;
+          this.selected.detail_orders[index].status_harga_order = true;
+          if (this.selected.detail_orders[index].original_is_lock) {
+            this.selected.detail_orders[index].is_lock = true;
+          }
+        }
+      },
       Edit : function(id){
         this.$router.push({ name: "EditOrder", params: { id_orders: id }});
 
@@ -280,32 +347,55 @@
       },
 
       accept : function(item){
+        this.selected.detail_orders = [];
         this.selected.id_orders = item.id_orders;
         this.selected.total_bayar = item.total_bayar;
         this.selected.invoice = item.invoice;
         this.selected.po = item.po;
         this.selected.customer = item.pembeli.nama;
         this.selected.id_sopir = null;
+        item.detail_orders.forEach((it, i) => {
+          this.selected.detail_orders.push({
+            id_orders: item.id_orders,
+            id_barang: it.id_barang,
+            id_pack: it.id_pack,
+            jumlah_barang: it.jumlah_barang,
+            jumlah_pack: it.jumlah_pack,
+            harga_pack: it.harga_pack,
+            harga_beli: it.harga_beli,
+            original_is_lock: it.is_lock,
+            is_lock: it.is_lock,
+            harga_order: it.harga_beli,
+            current_harga: Number(item.pembeli.margin) + Number(it.barang.current_harga.harga) +
+            Number(item.pembeli.group_customer.margin),
+            status_harga_order: true,
+            pack: it.pack,
+            barang: it.barang
+          })
+        });
       },
 
       acceptOrder : function(){
-        this.$bvToast.show("loading");
-        this.$bvModal.hide("modal_accept");
-        let conf = { headers: { "Api-Token" : this.key} };
-        let form = new FormData();
-        form.append("id_users", this.users.id_users);
-        form.append("id_sopir", this.selected.id_sopir);
+        if (confirm("Apakah Anda yakin akan verifikasi order ini?")) {
+          this.$bvToast.show("loading");
+          this.$bvModal.hide("modal_accept");
+          let conf = { headers: { "Api-Token" : this.key} };
+          let form = new FormData();
+          form.append("id_users", this.users.id_users);
+          form.append("id_sopir", this.selected.id_sopir);
+          form.append("detail_orders", JSON.stringify(this.selected.detail_orders));
 
-        axios.post(base_url + "/accept-orders/" + this.selected.id_orders, form, conf)
-        .then(response => {
-          this.$bvToast.hide("loading");
-          this.message = response.data.message;
-          this.$bvToast.show("message");
-          this.find();
-        })
-        .catch(error => {
-          alert(error);
-        })
+          axios.post(base_url + "/accept-orders/" + this.selected.id_orders, form, conf)
+          .then(response => {
+            this.$bvToast.hide("loading");
+            this.message = response.data.message;
+            this.$bvToast.show("message");
+            this.find();
+          })
+          .catch(error => {
+            alert(error);
+          })
+        }
       },
 
       find : function(){
@@ -318,6 +408,8 @@
         .then(response => {
           this.orders = response.data.orders;
           this.totalRow = response.data.count;
+
+          this.get_driver();
         })
         .catch(error => {
           alert(error);
@@ -344,11 +436,10 @@
           if (response.data.auth == false) {
             window.location = "login.html";
           } else{
+            this.key = token;
             this.users = response.data.cashier;
             this.orders.id_users = response.data.cashier.id_users;
-            this.get_driver();
             this.find();
-            this.key = token;
           }
         })
         .catch(error => {

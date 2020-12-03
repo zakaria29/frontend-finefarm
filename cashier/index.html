@@ -217,6 +217,8 @@
   <script src="../js/vue-cookies.js"></script>
   <script src="../js/http-vue-loader.js"></script>
   <script src="../js/axios.js"></script>
+  <script src="../assets/vendor/chart.js/dist/Chart.min.js"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script> -->
   <script src="https://unpkg.com/vue-select@latest"></script>
   <script src="https://unpkg.com/jspdf@1.5.3/dist/jspdf.min.js"></script>
   <script src="http://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
@@ -235,6 +237,13 @@
       let tgl = new Date(date);
       let parseDate = days[tgl.getDay()]+", " + tgl.getDate() + " " + months[tgl.getMonth()] +
       " " + tgl.getFullYear();
+      return parseDate;
+    }
+
+    function dateFormat(date){
+
+      let tgl = new Date(date);
+      let parseDate = tgl.getDate() + "-" + Number(tgl.getMonth()+1) + "-" + tgl.getFullYear();
       return parseDate;
     }
 
