@@ -12,7 +12,12 @@
             <div class="card-header">
               <div class="row align-items-center">
                 <div class="col">
-                  <h3 class="mb-0">Profil Cashier</h3>
+                  <h3 class="mb-0">
+                    <a class="text-primary" v-b-modal.modal_edit @click="EditProfil">
+                      <span class="fa fa-edit"></span>
+                    </a>
+                    Profil Cashier
+                  </h3>
                 </div>
               </div>
             </div>
@@ -217,6 +222,51 @@
 
       </div>
 
+      <b-toast id="message" title="Message" solid>
+        <strong class="text-success">{{ message }}</strong>
+      </b-toast>
+
+      <b-toast id="loading" title="Processing Data" solid no-auto-hide>
+        <!-- <b-spinner label="Spinning" variant="success"></b-spinner> -->
+        <span class="fa fa-spinner fa-spin"></span>
+        <strong class="text-success">Loading...</strong>
+      </b-toast>
+
+      <b-modal id="modal_edit" title="Detail Order"
+        header-bg-variant="info" size="sm"
+        border-variant="info" hide-footer>
+        <form v-on:submit.prevent="saveProfil">
+          <b-container fluid>
+            Nama
+            <b-form-input v-model="profile.nama" required class="mb-1">
+            </b-form-input>
+            Alamat
+            <b-form-input v-model="profile.alamat" required class="mb-1">
+            </b-form-input>
+            Email
+            <b-form-input v-model="profile.email" type="email" required class="mb-1">
+            </b-form-input>
+            Kontak
+            <b-form-input v-model="profile.contact" required class="mb-1">
+            </b-form-input>
+            Username
+            <b-form-input v-model="profile.username" required class="mb-1">
+            </b-form-input>
+            <b-form-checkbox v-model="profile.changePassword">
+              Ubah Password
+            </b-form-checkbox>
+            <div v-if="profile.changePassword">
+              Password
+              <b-form-input v-model="profile.password" type="password" required class="mb-1">
+              </b-form-input>
+            </div>
+
+            <b-button type="submit" block variant="primary">
+              Simpan
+            </b-button>
+          </b-container>
+        </form>
+      </b-modal>
     </div>
 
     <div class="card-footer">
@@ -268,6 +318,15 @@
         kembali_orders: [],
         from: "",
         to: "",
+        profile: {
+          nama: "",
+          alamat: "",
+          email: "",
+          contact: "",
+          username: "",
+          password: "",
+          changePassword: false
+        }
       }
     },
 
@@ -281,6 +340,40 @@
 
         });
         return total;
+      },
+
+      EditProfil : function(){
+        this.profile.nama = this.users.nama;
+        this.profile.alamat = this.users.alamat;
+        this.profile.contact = this.users.contact;
+        this.profile.email = this.users.email;
+        this.profile.username = this.users.username;
+        this.profile.password = "";
+        this.profile.changePassword = false;
+      },
+
+      saveProfil : function(){
+        this.$bvToast.show("loading");
+        this.$bvModal.hide("modal_edit");
+        let form = new FormData();
+        form.append("id_users", this.users.id_users);
+        form.append("nama", this.profile.nama);
+        form.append("alamat", this.profile.alamat);
+        form.append("email", this.profile.email);
+        form.append("contact", this.profile.contact);
+        form.append("username", this.profile.username);
+        if (this.profile.changePassword) {
+          form.append("password", this.profile.password);
+        }
+
+        axios.post(base_url + "/cashier/profil", form)
+        .then(response => {
+          this.$bvToast.hide("loading");
+          this.message = response.data.message;
+          this.$bvToast.show("message");
+          this.initUser();
+        })
+        .catch(error => console.log(error))
       },
 
       generateChart : function(){

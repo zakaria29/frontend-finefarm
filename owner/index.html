@@ -229,11 +229,18 @@
   <script src="../js/vue-cookies.js"></script>
   <script src="../js/http-vue-loader.js"></script>
   <script src="../js/axios.js"></script>
+  <script src="../assets/vendor/chart.js/dist/Chart.min.js"></script>
   <script src="https://unpkg.com/vue-select@latest"></script>
   <script type="text/javascript">
     function formatNumber(num) {
         // return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
         return parseFloat(num).toFixed(2).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+    }
+    function dateFormat(date){
+
+      let tgl = new Date(date);
+      let parseDate = tgl.getDate() + "-" + Number(tgl.getMonth()+1) + "-" + tgl.getFullYear();
+      return parseDate;
     }
     function formatDate(date){
       let days = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
