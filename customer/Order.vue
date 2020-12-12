@@ -130,10 +130,15 @@
                 <div class="col-2">
                   Keterangan Pack
                   <br />
-                   <b-form-checkbox v-model="d.harga_pack" switch @click="BeliPack(index)"
+                   <!-- <b-form-checkbox v-model="d.harga_pack" switch @click="BeliPack(index)"
                    :value="d.beli_pack" unchecked-value="">
                     {{ (d.harga_pack) ? "Beli Pack" : "Pinjam Pack" }}
-                  </b-form-checkbox>
+                  </b-form-checkbox> -->
+                  <b-form-select v-model="d.harga_pack">
+                    <option v-for="it in d.buy_pack" :value="it.harga_pack">
+                      {{ it.label }}
+                    </option>
+                  </b-form-select>
                 </div>
               </div>
               <div class="row mb-2">
@@ -238,7 +243,8 @@
           jumlah_pack: 0,
           beli_pack : 0,
           satuan: "",
-          is_lock : this.users_lock
+          is_lock : this.users_lock,
+          buy_pack: [],
         });
       },
 
@@ -263,8 +269,21 @@
         this.detail_order[index].beli_pack = item.harga;
         let barang = this.barang.find(it => it.id_barang === this.detail_order[index].id_barang);
         if (barang.satuan === "1") {
-          this.detail_order[index].jumlah_pack =
-          Math.ceil(Number(this.detail_order[index].jumlah_barang) * Number(item.kapasitas_kg));
+          let packBarang = barang.pack.find(it => it.id_pack === id);
+          if (packBarang.capacity_kg.length === 0) {
+            this.detail_order[index].jumlah_pack =
+            Math.ceil(Number(this.detail_order[index].jumlah_barang) * Number(item.kapasitas_kg));
+          }else{
+            let jumlah_barang = Number(this.detail_order[index].jumlah_barang);
+            let kapasitas = Number(item.kapasitas_kg);
+            let jumlah_pack = Math.floor(jumlah_barang / 10) * 10 * kapasitas;
+            let sisa = jumlah_barang % 10;
+            if(sisa > 0){
+              let s = packBarang.capacity_kg.find(it => it.kapasitas === sisa.toString());
+              jumlah_pack = Number(jumlah_pack) + Number(s.jumlah);
+            }
+            this.detail_order[index].jumlah_pack = jumlah_pack;
+          }
         }else if (barang.satuan === "2") {
           this.detail_order[index].jumlah_pack =
           Math.ceil(Number(this.detail_order[index].jumlah_barang) * Number(item.kapasitas_butir));
@@ -275,11 +294,21 @@
       },
 
       BeliPack : function(index){
-        if (this.detail_order[index].harga_pack) {
+        this.detail_order[index].buy_pack = [];
+        if (this.detail_order[index].beli_pack > 0) {
           let id_pack = this.detail_order[index].id_pack;
           let pack = this.detail_order[index].pack.find(it => it.id_pack === id_pack);
           this.detail_order[index].harga_pack = pack.harga;
+          this.detail_order[index].buy_pack.push(
+            { harga_pack: 0, label: "Pinjam Pack" },
+            { harga_pack: pack.harga, label: "Beli Pack" },
+          );
+          this.detail_order[index].harga_pack = 0;
         }else{
+          this.detail_order[index].harga_pack = 0;
+          this.detail_order[index].buy_pack.push(
+            { harga_pack: 0, label: "Beli Pack" }
+          );
           this.detail_order[index].harga_pack = 0;
         }
       },
@@ -410,8 +439,8 @@
               urutan = "0" + count;
             }
             let d = new Date();
-            this.orders.invoice = d.getFullYear().toString() + (d.getMonth()+1).toString() +
-            d.getDate().toString() +  initials + urutan;
+            this.orders.invoice = initials + d.getFullYear().toString() + (d.getMonth()+1).toString() +
+            d.getDate().toString() +  "-" + urutan;
 
             if(response.data.customer.lock_pack_barang.length > 0){
               this.barang = [];
@@ -419,6 +448,9 @@
               response.data.customer.lock_pack_barang.forEach((it, i) => {
                 brg = this.tempBarang.find(itm => itm.id_barang === it.id_barang);
                 brg.harga_lock = it.harga;
+                let tempPack = brg.pack;
+                brg.pack = [];
+                brg.pack.push(tempPack.find(itm => itm.id_pack === it.id_pack));
                 this.barang.push(brg);
               });
               this.users_lock = true;

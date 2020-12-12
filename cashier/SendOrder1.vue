@@ -22,7 +22,6 @@
         </div>
       </form>
 
-
       <ul class="list-group mt-2">
         <li class="list-group-item mb-2" v-for="item in orders">
           <b-row>
@@ -37,16 +36,10 @@
               <h4>Sopir: {{ item.sopir === null ? "-" : item.sopir.nama }}</h4>
             </b-col>
             <b-col>
-              <!-- <b-button class="btn btn-block btn-sm btn-dark" v-b-modal.modal_send
+              <b-button class="btn btn-block btn-sm btn-dark" v-b-modal.modal_send
               @click="send(item)">
                 <span class="fa fa-check"></span> Kirim Order
-              </b-button> -->
-              <b-badge pill class="bg-dark text-white mb-1">
-                <b-form-checkbox v-model="item.marked" @input="send(item)"
-                size="sm">
-                  Kirim Order
-                </b-form-checkbox>
-              </b-badge>
+              </b-button>
 
               <b-button class="btn btn-block btn-sm btn-info" v-if="(item.id_status_orders < 2)"
               @click="Edit(item.id_orders)">
@@ -86,13 +79,6 @@
       align="center"
       v-on:input="find">
       </b-pagination>
-
-      <div class="fixed-bottom m-1">
-        <b-button block size="md" variant="success" v-b-modal.modal_kirim @click="prepareOrder">
-          Kirim Order yang Ditandai
-        </b-button>
-      </div>
-
     </div>
 
     <b-toast id="message" title="Message" solid>
@@ -262,70 +248,6 @@
         </form>
       </b-container>
     </b-modal>
-
-    <b-modal id="modal_kirim" title="Send Order"
-      header-bg-variant="light" size="lg"
-      border-variant="dark" hide-footer>
-
-      <b-container fluid>
-        <form v-on:submit.prevent="sendOrder">
-          <ul class="list-group">
-            <li class="list-group-item" v-for="(pre, index) in totalPrepare">
-              <b-row class="mb-1 text-primary">
-                <b-col cols="4"> <strong>{{ pre.nama_barang }}</strong> </b-col>
-                <b-col cols="4">
-                  <strong>
-                    : {{ pre.jumlah }}
-                    {{ pre.satuan === '1' ? " Kg" : " Butir" }}
-                  </strong>
-                </b-col>
-                <b-col cols="4">
-                  <b-button size="sm" variant="success" @click="AddSupplier(index)">
-                    <span class="fa fa-plus"></span> Add Supplier List
-                  </b-button>
-                </b-col>
-              </b-row>
-              List Supplier
-              <b-row v-for="(s,i) in pre.supplier">
-                <b-col cols="4">
-                  <v-select :options="pre.suppliers" @input="BindSupplier(index, i)"
-                  :reduce="nama_supplier => nama_supplier.id_supplier"
-                  label="nama_supplier" v-model="s.id_supplier">
-                  <template #search="{attributes, events}">
-                    <input
-                      class="vs__search"
-                      :required="!s.id_supplier"
-                      v-bind="attributes"
-                      v-on="events"
-                    />
-                  </template>
-                  </v-select>
-                  <small v-if="s.id_supplier !== null">
-                    Stok: {{ s.max }}
-                  </small>
-                </b-col>
-                <b-col cols="4">
-                   <b-form-input type="number"
-                   v-model="s.jumlah"
-                   min="1"
-                   :max="s.max" required>
-                   </b-form-input>
-                </b-col>
-                <b-col cols="4">
-                  <b-button size="sm" variant="danger" @click="DropSupplier(index,i)">
-                    <span class="fa fa-trash"></span> Remove Supplier
-                  </b-button>
-                </b-col>
-              </b-row>
-            </li>
-          </ul>
-          <button type="submit" class="btn btn-sm btn-info btn-block"
-          :disabled="kirim_order.length === 0">
-            Send Order
-          </button>
-        </form>
-      </b-container>
-    </b-modal>
   </div>
 </template>
 <script type="text/javascript">
@@ -357,9 +279,6 @@
         },
         selectedOrder: null,
         detail_ambil_stok: [],
-        kirim_order: [],
-        totalPrepare: [],
-        readySupplier: [],
       }
     },
 
@@ -384,7 +303,7 @@
       },
 
       AddSupplier : function(index){
-        this.totalPrepare[index].supplier.push({
+        this.detail_ambil_stok[index].supplier.push({
           id_supplier: null,
           jumlah: 0,
           max: 0
@@ -392,78 +311,44 @@
       },
 
       DropSupplier : function(index, i){
-        if (this.totalPrepare[index].supplier.length > 1) {
-          this.totalPrepare[index].supplier.splice(i,1);
+        if (this.detail_ambil_stok[index].supplier.length > 1) {
+          this.detail_ambil_stok[index].supplier.splice(i,1);
         } else {
 
         }
       },
 
       BindSupplier : function(index, i){
-        let id = this.totalPrepare[index].supplier[i].id_supplier;
+        let id = this.detail_ambil_stok[index].supplier[i].id_supplier;
         if (id !== "") {
-          let idb = this.totalPrepare[index].id_barang;
-          let item = this.totalPrepare[index].suppliers.find(it => it.id_supplier === id);
+          let idb = this.detail_ambil_stok[index].id_barang;
+          let item = this.detail_ambil_stok[index].suppliers.find(it => it.id_supplier === id);
           if(item !== null){
             let data = item.stok_barang.find(it => it.id_barang === idb)
-            this.totalPrepare[index].supplier[i].max = data.stok;
+            this.detail_ambil_stok[index].supplier[i].max = data.stok;
           }
         }
       },
 
       send : function(item){
         this.selectedOrder = item;
-        if (item.marked) {
-          let ambil_stok = [];
-          item.detail_orders.forEach((detail, i) => {
-            ambil_stok.push({
-              id_barang: detail.id_barang,
-              nama_barang: detail.barang.nama_barang,
-              jumlah: detail.jumlah_barang,
-              satuan: detail.barang.satuan
-            });
-          });
-
-          this.kirim_order.push({
-            id_orders: item.id_orders,
-            ambil_stok: ambil_stok
-          });
-        }
-        else{
-          let index = this.kirim_order.findIndex(it => it.id_orders === item.id_orders);
-          this.kirim_order.splice(index,1);
-        }
-      },
-
-      prepareOrder : function(){
-        this.totalPrepare = [];
-        this.kirim_order.forEach((item, i) => {
-          item.ambil_stok.forEach(it => {
-            let index = this.totalPrepare.findIndex(itm => itm.id_barang === it.id_barang);
-            if (index < 0) {
-              this.totalPrepare.push({
-                id_barang: it.id_barang,
-                nama_barang: it.nama_barang,
-                jumlah: it.jumlah,
-                satuan: it.satuan,
-                suppliers: this.supplier.filter(itm => {
-                  if(itm.stok_barang.some(sb => sb.id_barang === it.id_barang))
-                  return it
-                }),
-                supplier: [{
-                  id_supplier: null,
-                  jumlah: 0,
-                  max: 0
-                }]
-              });
-            }else{
-              this.totalPrepare[index].jumlah =
-              Number(this.totalPrepare[index].jumlah) + Number(it.jumlah);
-            }
+        this.detail_ambil_stok = [];
+        item.detail_orders.forEach((detail, i) => {
+          this.detail_ambil_stok.push({
+            id_barang: detail.id_barang,
+            nama_barang: detail.barang.nama_barang,
+            jumlah_barang: detail.jumlah_barang,
+            suppliers: this.supplier.filter(it => {
+              if(it.stok_barang.some(sb => sb.id_barang === detail.id_barang))
+              return it
+            }),
+            supplier: [{
+              id_supplier: null,
+              jumlah: 0,
+              max: 0
+            }]
           });
         });
-
-
       },
 
       sendOrder : function(){
@@ -472,50 +357,19 @@
           this.$bvModal.hide("modal_send");
           let conf = { headers: { "Api-Token" : this.key} };
           let form = new FormData();
-
-          this.kirim_order.forEach(item => {
-            item.get_stok = [];
-            item.ambil_stok.forEach((it, i) => {
-              it.jml = it.jumlah;
-              let prepare = this.totalPrepare.find(itm => itm.id_barang === it.id_barang);
-              for(let s of prepare.supplier) {
-                if ((s.jumlah - it.jml >= 0 )) {
-                  item.get_stok.push({
-                    id_supplier: s.id_supplier,
-                    id_barang: it.id_barang,
-                    jumlah: it.jml
-                  });
-                  s.jumlah = s.jumlah - it.jml;
-                  break;
-                }else{
-                  item.get_stok.push({
-                    id_supplier: s.id_supplier,
-                    id_barang: it.id_barang,
-                    jumlah: s.jumlah
-                  });
-                  it.jml = it.jml - s.jumlah;
-                  s.jumlah = it.jml;
-                }
-              }
-            });
-          });
-
-
-          this.$bvToast.show("loading");
-          this.$bvModal.hide("modal_kirim");
           form.append("id_users", this.users.id_users);
-          form.append("kirim_order", JSON.stringify(this.kirim_order));
-          axios.post(base_url + "/kirim-orders", form, conf)
+          form.append("detail_ambil_stok", JSON.stringify(this.detail_ambil_stok));
+
+          axios.post(base_url + "/send-orders/" + this.selectedOrder.id_orders, form, conf)
           .then(response => {
             this.$bvToast.hide("loading");
             this.message = response.data.message;
             this.$bvToast.show("message");
             this.find();
-            this.kirim_order = [];
-            // window.open(base_url + "/struk/" + this.selectedOrder.id_orders,'_blank');
+            window.open(base_url + "/struk/" + this.selectedOrder.id_orders,'_blank');
           })
           .catch(error => {
-            console.log(error);
+            alert(error);
           })
         }
       },
@@ -528,10 +382,6 @@
 
         axios.post(base_url + "/prepare-orders/" + this.perPage + "/" + offset, form, conf)
         .then(response => {
-          response.data.orders.forEach((item, i) => {
-            item.marked = false;
-          });
-
           this.orders = response.data.orders;
           this.totalRow = response.data.count;
         })

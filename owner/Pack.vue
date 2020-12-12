@@ -15,6 +15,17 @@
           <b-button class="btn btn-sm btn-danger" @click="Drop(data.item.id_pack)">
             <span class="fa fa-trash"></span>
           </b-button>
+          <br />
+          <small class="text-info">* hanya untuk pack tertentu</small>
+          <br />
+          <b-button size="sm" variant="warning" v-b-modal.modal_kapasitas
+          @click="EditKapasitas(data.item, '1')">
+            Kapasitas dalam Kg
+          </b-button>
+          <b-button size="sm" variant="dark" v-b-modal.modal_kapasitas
+          @click="EditKapasitas(data.item, '2')">
+            Kapasitas satuan Butir
+          </b-button>
         </template>
         <template v-slot:cell(harga)="data">
           {{ "Rp " + formatNumber(data.item.harga) }}
@@ -58,6 +69,52 @@
      </b-container>
    </b-modal>
 
+   <b-modal
+    id="modal_kapasitas"
+    title="Kapasitas Pack"
+    header-bg-variant="info" size="lg"
+    border-variant="info" hide-footer>
+
+    <b-container fluid v-if="selectedPack !== null">
+      <form v-on:submit.prevent="SaveKapasitasPack">
+        Nama Pack: {{ selectedPack.nama_pack }}
+        <ul class="list-group">
+          <li class="list-group-item">
+            <b-row>
+              <b-col cols="5"> <strong>
+                Kapasitas {{ (selectedPack.satuan === '1' ? ' (Kg)' : ' (Butir)') }}
+              </strong> </b-col>
+              <b-col cols="5"> <strong>Jumlah</strong> </b-col>
+              <b-col>
+                <b-button variant="success" @click="AddKapasitas" size="sm">
+                  <span class="fa fa-plus"></span>
+                </b-button>
+              </b-col>
+            </b-row>
+          </li>
+          <li class="list-group-item" v-for="(item,i) in selectedPack.kapasitas">
+            <b-row>
+              <b-col cols="5">
+                <b-form-input v-model="item.kapasitas" size="sm" type="number" required min="1" />
+              </b-col>
+              <b-col cols="5">
+                <b-form-input v-model="item.jumlah" size="sm" type="number" required min="1" />
+              </b-col>
+              <b-col>
+                <b-button variant="danger" @click="RemoveKapasitas(i)" size="sm">
+                  <span class="fa fa-trash"></span>
+                </b-button>
+              </b-col>
+            </b-row>
+          </li>
+        </ul>
+        <b-button type="submit" variant="success" size="md" block>
+           <span class="fa fa-check"></span> Simpan
+         </b-button>
+      </form>
+    </b-container>
+  </b-modal>
+
    <!-- toast -->
    <!-- toast untuk tampilan message box -->
    <b-toast id="message" title="Message" solid>
@@ -88,6 +145,7 @@ module.exports = {
       message: "",
       package: [],
       fields: ["nama_pack","stok","harga","option"],
+      selectedPack: null,
     }
   },
 
@@ -96,11 +154,61 @@ module.exports = {
       let conf = { headers: { "Api-Token" : this.key} };
       axios.get(base_url + "/pack", conf)
       .then(response => {
+        response.data.pack.forEach((item, i) => {
+          item.kapasitas = [];
+          item.satuan = "";
+        });
+
         this.package = response.data.pack;
         this.$bvToast.hide("loading");
       })
       .catch(error => {
         alert(error);
+      })
+    },
+
+    EditKapasitas : function(item, satuan){
+      this.selectedPack = item;
+      if (satuan === "1") {
+        this.selectedPack.satuan = "1";
+        this.selectedPack.kapasitas = this.selectedPack.kapasitas_kg;
+      }else if(satuan === "2"){
+        this.selectedPack.satuan = "2";
+        this.selectedPack.kapasitas = this.selectedPack.kapasitas_butir;
+      }
+    },
+
+    AddKapasitas : function(){
+      this.selectedPack.kapasitas.push({
+        jumlah: 0,
+        kapasitas: 0,
+        satuan: this.selectedPack.satuan
+      })
+    },
+
+    RemoveKapasitas : function(index){
+      this.selectedPack.kapasitas.splice(index,1);
+    },
+
+    SaveKapasitasPack : function(){
+      this.$bvToast.show("loading");
+      this.$bvModal.hide("modal_kapasitas");
+      let conf = { headers: { "Api-Token" : this.key} };
+      let form = new FormData();
+      form.append("id_pack", this.selectedPack.id_pack);
+      form.append("satuan", this.selectedPack.satuan);
+      form.append("kapasitas_pack", JSON.stringify(this.selectedPack.kapasitas));
+
+      let useUrl = base_url + "/pack/kapasitas";
+      axios.post(useUrl, form, conf)
+      .then(response => {
+        this.$bvToast.hide("loading");
+        this.message = response.data.message;
+        this.get_pack();
+        this.$bvToast.show("message");
+      })
+      .catch(error => {
+        console.log(error);
       })
     },
 

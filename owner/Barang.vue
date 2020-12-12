@@ -177,7 +177,7 @@ module.exports = {
       barangs: [],
       pack: [],
       logHarga: [],
-      selectedPack : "",
+      selectedPack: "",
       title_modal: "",
       fields: ["nama_barang","satuan","stok","harga","option"],
     }
@@ -194,15 +194,19 @@ module.exports = {
       this.logHarga = item.log_harga_barang;
     },
     TambahPack : function(){
-      if (! this.pack_barang.some(el => el.id_pack === this.selectedPack)) {
-        let item = this.pack.find(elm => elm.id_pack === this.selectedPack);
-        this.pack_barang.push({
-          id_pack : item.id_pack,
-          nama_pack: item.nama_pack,
-          keterangan: item.keterangan,
-          kapasitas_kg: 0,
-          kapasitas_butir: 0,
-        });
+      if (this.selectedPack !== "") {
+        if (! this.pack_barang.some(el => el.id_pack === this.selectedPack)) {
+          let item = this.pack.find(elm => elm.id_pack === this.selectedPack);
+          this.pack_barang.push({
+            id_pack : item.id_pack,
+            nama_pack: item.nama_pack,
+            keterangan: item.keterangan,
+            kapasitas_kg: 0,
+            kapasitas_butir: 0,
+          });
+        }
+      }else{
+        alert("Pilih Pack terlebih dahulu")
       }
     },
 
@@ -225,8 +229,17 @@ module.exports = {
       let conf = { headers: { "Api-Token" : this.key} };
       axios.get(base_url + "/barang", conf)
       .then(response => {
+        response.data.barang.forEach((item, i) => {
+          item.pack.forEach(it => {
+            it.kapasitas_kg *= 10;
+            it.kapasitas_butir = 1 / it.kapasitas_butir;
+          });
+
+        });
+
         this.barangs = response.data.barang;
         this.$bvToast.hide("loading");
+        this.get_pack();
       })
       .catch(error => {
         console.log(error);
@@ -327,7 +340,7 @@ module.exports = {
   mounted(){
     this.$bvToast.show("loading");
     this.get_barang();
-    this.get_pack();
+
 
   }
 }
