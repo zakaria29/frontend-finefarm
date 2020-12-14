@@ -170,6 +170,12 @@
                         <router-link class="dropdown-item" to="/mutasi-stok">
                           <i class="ni ni-ui-04"></i> Mutasi Stok
                         </router-link>
+                        <router-link class="dropdown-item" to="/tanggungan-pack">
+                          <i class="fa fa-box"></i> Tanggungan Pack
+                        </router-link>
+                        <router-link class="dropdown-item" to="/tanggungan-pembayaran">
+                          <i class="fa fa-money-bill-alt"></i> Tanggungan Pembayaran
+                        </router-link>
                       </div>
                   </li>
 
@@ -273,6 +279,8 @@
       { path: "/", name: "Home", component: httpVueLoader("Dashboard.vue")},
       { path: "/mutasi-pack", name: "MutasiPack", component: httpVueLoader("MutasiPack.vue")},
       { path: "/mutasi-stok", name: "MutasiStok", component: httpVueLoader("MutasiStok.vue")},
+      { path: "/tanggungan-pack", name: "TanggunganPack", component: httpVueLoader("TanggunganPack.vue")},
+      { path: "/tanggungan-pembayaran", name: "TanggunganPembayaran", component: httpVueLoader("TanggunganPembayaran.vue")},
       { path: "/owner", name: "Owner", component: httpVueLoader("Owner.vue")},
       { path: "/cashier", name: "Cashier", component: httpVueLoader("Cashier.vue")},
       { path: "/customer", name: "Customer", component: httpVueLoader("Customer.vue")},

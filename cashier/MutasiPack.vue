@@ -33,7 +33,7 @@
             Tgl. Akhir
             <b-form-input class="mb-1" type="date" v-model="to" required></b-form-input>
           </b-col>
-          <b-button type="submit" block size="sm" variant="success">
+          <b-button type="submit" block variant="primary">
             Get Mutasi
           </b-button>
         </b-row>
@@ -55,6 +55,9 @@
       </b-toast>
 
       <div class="mt-2" v-if="mutasi.length > 0">
+        <b-button variant="success" @click="exportsExcel" class="mb-2">
+          <span class="fa fa-file-excel"></span> Export to Excel
+        </b-button>
         <b-table :items="mutasi" :fields="fields">
           <template v-slot:cell(waktu)="data">
             {{ formatDate(data.item.waktu) }}
@@ -125,6 +128,20 @@
         })
       },
 
+      exportsExcel : function(){
+        if (this.id_pembeli === "0") {
+          window.open(
+            base_url + "/export-mutasi-pack/" + this.id_pack + "/" +
+            this.from + "/" + this.to,
+            '_blank');
+        } else {
+          window.open(
+            base_url + "/export-mutasi-pack/" + this.id_pack + "/" +
+            this.from + "/" + this.to + "/" + this.id_pembeli,
+            '_blank');
+        }
+      },
+
       get_pack : function(){
         let conf = { headers: { "Api-Token" : this.key} };
         axios.get(base_url + "/pack", conf)
@@ -140,7 +157,7 @@
       get_customer : function(){
         let first = [{id_users: "0", nama: "Semua Customer"}];
         let conf = { headers: { "Api-Token" : this.key} };
-        axios.get(base_url + "/customer", conf)
+        axios.get(base_url + "/customers", conf)
         .then(response => {
           this.customer = [...first,...response.data.customer];
         })

@@ -40,7 +40,7 @@
             </b-form-input>
           </b-col>
         </b-row>
-        <b-button type="submit" block variant="success">
+        <b-button type="submit" block variant="primary">
           Get Mutasi
         </b-button>
       </form>
@@ -61,6 +61,9 @@
       </b-toast>
 
       <div class="mt-2" v-if="mutasi.length > 0">
+        <b-button variant="success" @click="exportsExcel" class="mb-2">
+          <span class="fa fa-file-excel"></span> Export to Excel
+        </b-button>
         <b-table :items="mutasi" :fields="fields">
           <template v-slot:cell(waktu)="data">
             {{ formatDate(data.item.waktu) }}
@@ -124,6 +127,13 @@
         .catch(error => {
           console.log(error);
         })
+      },
+
+      exportsExcel : function(){
+        window.open(
+          base_url + "/export-mutasi-stok/" + this.id_barang + "/" + this.id_supplier + "/" +
+          this.from + "/" + this.to,
+          '_blank');
       },
 
       get_barang : function(){

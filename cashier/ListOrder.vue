@@ -4,7 +4,6 @@
       <h3>
         <span class="fa fa-list"></span> Data Order
       </h3>
-
     </div>
     <div class="card-body">
       <h4>Filter Data</h4>
@@ -20,21 +19,31 @@
              <b-form-input v-model="to" type="date" required>
              </b-form-input>
           </div>
-          <div class="col-6">
+          <div class="col-5">
             Pencarian
              <b-form-input v-model="search" type="text" placeholder="Kata Kunci">
              </b-form-input>
           </div>
-          <div class="col-2">
+          <div class="col-3">
             <br />
             <b-button type="submit" class="btn btn-info">
               <span class="fa fa-search"></span> Cari
+            </b-button>
+            <b-button v-if="orders.length > 0" class="btn btn-success" @click="exportsExcel">
+              <span class="fa fa-file-excel"></span> Export Excel
             </b-button>
           </div>
         </div>
       </form>
       <hr />
 
+      <div class="mt-1">
+        <b-button size="md" v-b-modal.modal_kuitansi
+        v-b-tooltip.hover title="Buat Kuitansi" class="bg-red text-white"
+        >
+          <span class="fa fa-sticky-note"></span> Buat Kuitansi
+        </b-button>
+      </div>
 
       <b-row id="summary" class="mt-2">
         <b-col>
@@ -141,6 +150,37 @@
       </b-pagination>
     </div>
 
+    <b-modal id="modal_kuitansi" title="Buat Kuitansi"
+      header-bg-variant="info" size="md"
+      border-variant="info" hide-footer>
+      <b-container fluid>
+        <form v-on:submit.prevent="generateKuitansi">
+          Pilih Customer
+          <v-select :options="customer" class="mb-2"
+          :reduce="nama => nama.id_users" label="nama" v-model="kuitansi.id_pembeli">
+          <template #search="{attributes, events}">
+            <input
+              class="vs__search"
+              :required="!kuitansi.id_pembeli"
+              v-bind="attributes"
+              v-on="events"
+            />
+          </template>
+          </v-select>
+          Start Date
+          <b-form-input v-model="kuitansi.from" type="date" required class="mb-2">
+          </b-form-input>
+          End Date
+          <b-form-input v-model="kuitansi.to" type="date" required class="mb-2">
+          </b-form-input>
+
+          <b-button variant="primary" type="submit" block>
+            Generate Kuitansi
+          </b-button>
+        </form>
+      </b-container>
+    </b-modal>
+
     <b-modal id="modal_detail" title="Detail Order"
       header-bg-variant="info" size="lg"
       border-variant="info" hide-footer>
@@ -226,6 +266,8 @@
 				</li>
       </ul>
     </b-modal>
+
+
   </div>
 </template>
 <script type="text/javascript">
@@ -235,6 +277,7 @@
         message : "",
         key: "",
         orders: [],
+        customer: [],
         detail_orders: [],
         log_orders: [],
         totalRow: 0,
@@ -261,12 +304,24 @@
           piutang: 0,
           barang: []
         },
+        kuitansi: {
+          from: "",
+          to: "",
+          id_pembeli: "",
+        },
 
       }
     },
 
     methods: {
-
+      generateKuitansi : function(){
+        let id_pembeli = this.kuitansi.id_pembeli;
+        let from = this.kuitansi.from;
+        let to = this.kuitansi.to;
+        window.open(
+          base_url + "/kuitansi/" + id_pembeli + "/" + from + "/" + to,
+          '_blank');
+      },
 
       Edit : function(id){
         this.$router.push({ name: "EditOrder", params: { id_orders: id }});
@@ -290,6 +345,32 @@
 
       Print : function(item){
         window.open(base_url + "/struk/" + item.id_orders,'_blank');
+      },
+
+      exportsExcel : function(){
+        if (this.search === "") {
+          window.open(
+            base_url + "/export-orders/" +
+            this.from + "/" + this.to,
+            '_blank');
+        } else {
+          window.open(
+            base_url + "/export-orders/" +
+            this.from + "/" + this.to + "/" + this.search,
+            '_blank');
+        }
+      },
+
+      get_customer : function(){
+        let conf = { headers: { "Api-Token" : this.key} };
+        axios.get(base_url + "/customers", conf)
+        .then(response => {
+          this.customer = response.data.customer;
+          this.find();
+        })
+        .catch(error => {
+          console.log(error);
+        })
       },
 
       find : function(){
@@ -316,7 +397,7 @@
           .catch(error => {
             console.log(error);
           })
-          
+
         })
         .catch(error => {
           console.log(error);
@@ -332,7 +413,7 @@
       this.to = currentDate;
       let lastMonth = new Date(date.getFullYear(), date.getMonth()-1, date.getDate());
       this.from = lastMonth.toISOString().slice(0,10);
-      this.find();
+      this.get_customer();
     }
   }
 </script>
