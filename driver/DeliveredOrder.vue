@@ -51,12 +51,31 @@
               @click="LogOrder(item)">
                 <span class="fa fa-history"></span> Log Order
               </b-button>
+
+              <b-button class="btn btn-block btn-sm btn-danger" v-b-modal.modal_kendala
+              @click="Kendala(item)">
+                <span class="fa fa-window-close"></span> Kendala Pengiriman
+              </b-button>
+            </b-col>
+          </b-row>
+          <b-row class="my-1" v-if="item.catatan !== ''">
+            <b-col>
+              Catatan: {{ item.catatan }}
             </b-col>
           </b-row>
           <b-row>
             <b-col>
-              <b-badge pill :variant="type[item.id_status_orders]">
-                Status: {{ item.status_orders.nama_status_order }}
+              Status Order:
+              <b-badge pill class="text-white" :variant="type[item.id_status_orders]">
+                {{ item.status_orders.nama_status_order }}
+              </b-badge>
+            </b-col>
+          </b-row>
+          <b-row class="my-1" v-if="item.kendala !== ''">
+            <b-col>
+              Kendala Pengiriman:
+              <b-badge class="bg-orange text-white">
+                {{ item.kendala }}
               </b-badge>
             </b-col>
           </b-row>
@@ -83,6 +102,23 @@
       <span class="fa fa-spinner fa-spin"></span>
       <strong class="text-success">Loading...</strong>
     </b-toast>
+
+    <b-modal id="modal_kendala" title="Kendala Pengiriman Order"
+      header-bg-variant="info" size="lg"
+      border-variant="info" hide-footer>
+      <b-container fulid>
+        <form v-on:submit.prevent="SaveKendala">
+          <h4>Customer: {{ order.nama_pembeli }}</h4>
+          <h4>Invoice: {{ order.invoice }}</h4>
+          <h4>Kendala: </h4>
+          <textarea v-model="order.kendala" class="form-control" required rows="5">
+          </textarea>
+          <b-button variant="success" class="mt-2" type="submit" block>
+            Simpan
+          </b-button>
+        </form>
+      </b-container>
+    </b-modal>
 
     <b-modal id="modal_detail" title="Detail Order"
       header-bg-variant="info" size="lg"
@@ -197,7 +233,7 @@
                       <small class="text-info"><i>Jumlah Semula</i></small>
                     </b-col>
                     <b-col cols="3">
-                      <small class="text-danger"><i>Dikurangi sejumlah</i></small>
+                      <small class="text-danger"><i>Dikembalikan sebanyak</i></small>
                     </b-col>
                   </b-row>
                 </li>
@@ -316,6 +352,7 @@
           waktu_pengiriman: "",
           tgl_jatuh_tempo: "",
           total_bayar: 0,
+          kendala: "",
         },
         selectedOrder: null,
         setorUang: [],
@@ -330,6 +367,33 @@
     methods: {
       Edit : function(id){
         this.$router.push({ name: "EditOrder", params: { id_orders: id }});
+      },
+
+      Kendala : function(item){
+        this.order.id_orders = item.id_orders;
+        this.order.invoice = item.invoice;
+        this.order.nama_pembeli = item.pembeli.nama;
+        this.order.kendala = "";
+      },
+
+      SaveKendala : function(){
+        this.$bvToast.show("loading");
+        this.$bvModal.hide("modal_kendala");
+        let conf = { headers: { "Api-Token" : this.key} };
+        let form = new FormData();
+        form.append("id_orders", this.order.id_orders);
+        form.append("kendala", this.order.kendala);
+
+        axios.post(base_url + "/kendala", form, conf)
+        .then(response => {
+          this.$bvToast.hide("loading");
+          this.message = response.data.message;
+          this.$bvToast.show("message");
+          this.find();
+        })
+        .catch(error => {
+          alert(error);
+        })
       },
 
       getTotal : function(arr){

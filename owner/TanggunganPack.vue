@@ -34,7 +34,8 @@
             <h3>{{ item.nama }}</h3>
             <h4>Tanggungan Pack:</h4>
             <b-row>
-              <b-col cols="4" v-for="it in item.tanggungan_pack">
+              <b-col cols="4" v-for="it in item.tanggungan_pack"
+              v-if="item.tanggungan_pack.length > 0">
                 <strong class="text-info">{{ it.pack.nama_pack }}</strong>
                 <strong>: {{ it.jumlah }} <small>item</small> </strong>
               </b-col>

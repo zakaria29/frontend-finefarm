@@ -8,12 +8,12 @@
     <div class="card-body">
       <form v-on:submit.prevent="getMutasi">
         <b-row>
-          <b-col cols="8">
+          <b-col cols="4">
             Pilih Pack
             <b-form-select v-model="id_pack" class="mb-2" required>
               <option v-for="p in pack" :value="p.id_pack">{{ p.nama_pack }}</option>
             </b-form-select>
-            Pilih Customer
+            <!-- Pilih Customer
             <v-select :options="customer"
             :reduce="nama => nama.id_users" label="nama" v-model="id_pembeli">
             <template #search="{attributes, events}">
@@ -24,12 +24,14 @@
                 v-on="events"
               />
             </template>
-            </v-select>
+            </v-select> -->
           </b-col>
 
           <b-col>
             Tgl. Awal
             <b-form-input class="mb-1" type="date" v-model="from" required></b-form-input>
+          </b-col>
+          <b-col>
             Tgl. Akhir
             <b-form-input class="mb-1" type="date" v-model="to" required></b-form-input>
           </b-col>
@@ -78,7 +80,7 @@
           <template v-slot:cell(total_beli)="data">
             {{ data.item.beli > 0 ? "Rp " + formatNumber(data.item.harga * data.item.beli) : "-" }}
           </template>
-          <template v-slot:cell(stok)="data">
+          <template v-slot:cell(stok_akhir)="data">
             <strong class="text-info">
               {{ Number(data.item.stok)-Number(data.item.keluar)+Number(data.item.masuk) }}
             </strong>
@@ -95,12 +97,12 @@
       return {
         users: null,
         mutasi: [],
-        fields:["waktu","masuk","keluar","beli","total_beli","stok"],
+        fields:["waktu","masuk","keluar","beli","total_beli","stok_akhir"],
         message : "",
         pack: [],
         id_pack: "",
         customer: [],
-        id_pembeli: "",
+        id_pembeli: "0",
         from: "",
         to: "",
         key: "",
@@ -147,7 +149,7 @@
         axios.get(base_url + "/pack", conf)
         .then(response => {
           this.pack = response.data.pack;
-          this.get_customer();
+          // this.get_customer();
         })
         .catch(error => {
           console.log(error);

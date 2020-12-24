@@ -148,7 +148,7 @@
     </div>
 
     <div class="card-footer">
-      <h2>Grafik Order</h2>
+      <h2>Grafik Omset</h2>
       <form v-on:submit.prevent="generateChart">
         <b-row class="mb-2">
           <b-col cols="5">

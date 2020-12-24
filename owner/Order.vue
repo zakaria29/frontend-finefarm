@@ -28,7 +28,7 @@
           </div>
         </div>
 
-        <div class="row mb-2">
+        <div class="row mb-2" v-if="false">
           <div class="col-sm-3">
             Waktu Order
           </div>
@@ -70,7 +70,7 @@
           </div>
           <div class="col-4">
             <input type="text" v-model="orders.invoice"
-            class="form-control" required />
+            class="form-control" required readonly />
           </div>
         </div>
 
@@ -374,8 +374,7 @@
           // console.log(this.orders.tgl_jatuh_tempo);
         }
         let nama = item.nama;
-        var initials = nama.match(/\b\w/g) || [];
-        initials = ((initials.shift() || '') + (initials.pop() || '')).toUpperCase();
+        var initials = item.inisial;
         let count = Number(item.orders.length) + 1;
         let urutan = null;
         if (count.toString().length == 1) {

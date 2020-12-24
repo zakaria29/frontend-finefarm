@@ -53,10 +53,24 @@
               </b-button>
             </b-col>
           </b-row>
+          <b-row class="my-1" v-if="item.catatan !== ''">
+            <b-col>
+              Catatan: {{ item.catatan }}
+            </b-col>
+          </b-row>
           <b-row>
             <b-col>
-              <b-badge pill :variant="type[item.id_status_orders]">
-                Status: {{ item.status_orders.nama_status_order }}
+              Status Order:
+              <b-badge pill class="text-white" :variant="type[item.id_status_orders]">
+                {{ item.status_orders.nama_status_order }}
+              </b-badge>
+            </b-col>
+          </b-row>
+          <b-row class="my-1" v-if="item.kendala !== ''">
+            <b-col>
+              Kendala Pengiriman:
+              <b-badge class="bg-orange text-white">
+                {{ item.kendala }}
               </b-badge>
             </b-col>
           </b-row>

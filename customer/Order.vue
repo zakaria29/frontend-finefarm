@@ -9,7 +9,7 @@
     <div class="card-body">
 
       <form v-on:submit.prevent="Save">
-        <div class="row mb-2">
+        <div class="row mb-2" v-if="false">
           <div class="col-sm-3">
             Waktu Order
           </div>
@@ -52,11 +52,11 @@
           </div>
           <div class="col-4">
             <input type="text" v-model="orders.invoice"
-            class="form-control" required />
+            class="form-control" required readonly />
           </div>
         </div>
 
-        <div class="row mb-2">
+        <div class="row mb-2" v-if="false">
           <div class="col-3">
             Tipe Pembayaran
           </div>
@@ -214,7 +214,7 @@
           time_order: "",
           waktu_pengiriman: "",
           tgl_jatuh_tempo: "",
-          tipe_pembayaran: "",
+          tipe_pembayaran: "0",
           total_bayar: 0,
           down_payment: 0,
           po: "",
@@ -429,8 +429,7 @@
             this.margin_group = response.data.customer.group_customer.margin;
 
             let nama = response.data.customer.nama;
-            var initials = nama.match(/\b\w/g) || [];
-            initials = ((initials.shift() || '') + (initials.pop() || '')).toUpperCase();
+            var initials = response.data.customer.inisial;
             let count = Number(response.data.customer.orders.length) + 1;
             let urutan = null;
             if (count.toString().length == 1) {
@@ -475,7 +474,7 @@
 
         this.orders.waktu_pengiriman =  "";
         this.orders.tgl_jatuh_tempo =  "";
-        this.orders.tipe_pembayaran =  "";
+        this.orders.tipe_pembayaran =  "0";
         this.orders.total_bayar =  0;
         this.orders.down_payment =  0;
         this.orders.po =  "";

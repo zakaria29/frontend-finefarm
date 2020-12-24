@@ -33,7 +33,7 @@
                 <h3 class="text-info">Total: Rp {{ formatNumber(item.orders.total_bayar) }}</h3>
               </b-col>
               <b-col>
-                <b-button class="btn btn-block btn-sm btn-primary" v-b-modal.modal_verify
+                <b-button varint="primary" size="sm" block v-b-modal.modal_verify
                 @click="Verify(item)">
                   <span class="fa fa-check"></span> Verifikasi
                 </b-button>
@@ -67,7 +67,7 @@
                         <small class="text-success"><i>Nama Barang</i></small>
                       </b-col>
                       <b-col cols="3">
-                        <small class="text-danger"><i>Dikurangi sejumlah</i></small>
+                        <small class="text-danger"><i>Dikembalikan Sebanyak</i></small>
                       </b-col>
                       <b-col>
                         <small class="text-warning"> <i>Supplier</i> </small>

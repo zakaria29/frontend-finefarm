@@ -28,9 +28,12 @@
       <b-alert class="mt-2" variant="warning" :show="tanggungan.length === 0">
         Tidak Ada Tanggungan Pembayaran
       </b-alert>
+
+      <h2> <strong>Total Piutang: Rp {{ formatNumber(total) }} </strong> </h2>
+
       <div class="mt-2" v-if="tanggungan.length > 0">
         <ul class="list-group">
-          <li class="list-group-item" v-for="item in tanggungan">
+          <li class="list-group-item" v-for="item in tanggungan" v-if="item.bill.length > 0">
             <h3>{{ item.nama }}</h3>
             <h4 class="text-primary">
               Tanggungan Pembayaran: {{ "Rp "+ formatNumber(getTotal(item.bill)) }}
@@ -63,6 +66,7 @@
         key: "",
         selectedUser: null,
         tanggungan_pack: [],
+        total: 0,
       }
     },
 
@@ -84,6 +88,12 @@
         .then(response => {
           this.$bvToast.hide("loading");
           this.tanggungan = response.data;
+          response.data.forEach((item, i) => {
+            item.bill.forEach((it, j) => {
+              this.total = Number(this.total) + Number(it.nominal)
+            });
+          });
+
         })
         .catch(error => {
           console.log(error);

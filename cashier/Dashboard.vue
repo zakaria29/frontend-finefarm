@@ -67,12 +67,12 @@
           </div>
 
           <div class="card card-stats">
-            <div class="card-body">
+            <div :class="total_verify > 0 ? 'card-body bg-lighter' : 'card-body'">
               <router-link to="/accept">
                 <div class="row">
                   <div class="col">
                     <h5 class="card-title text-uppercase text-muted mb-0">
-                      Order yang perlu diverifikasi
+                      <strong>Order yang perlu diverifikasi</strong>
                     </h5>
                     <span class="h2 font-weight-bold mb-0">
                       {{ total_verify }}
@@ -89,7 +89,7 @@
           </div>
 
           <div class="card card-stats">
-            <div class="card-body">
+            <div :class="total_send > 0 ? 'card-body bg-lighter' : 'card-body'">
               <router-link to="/send">
                 <div class="row">
                   <div class="col">
@@ -115,7 +115,8 @@
         <div class="col-xl-4 col-md-6">
           <!-- tanggungan pack -->
           <div class="card card-stats">
-            <div class="card-body">
+            <div :class="kembali_pack.filter(it => it.kembali_pack.length > 0).length > 0 ?
+            'card-body bg-lighter' : 'card-body'">
               <router-link to="/setoran-pack">
                 <div class="row">
                   <div class="col">
@@ -143,12 +144,12 @@
           </div>
 
           <div class="card card-stats">
-            <div class="card-body">
+            <div :class="pay_verify > 0 ? 'card-body bg-lighter' : 'card-body'">
               <router-link to="/verify-pembayaran">
                 <div class="row">
                   <div class="col">
                     <h5 class="card-title text-uppercase text-muted mb-0">
-                      Pembayaran yang perlu diverifikasi
+                      Verifikasi Pembayaran Customer
                     </h5>
                     <span class="h2 font-weight-bold mb-0">
                       {{ "Rp " + formatNumber(pay_verify) }}
@@ -165,12 +166,12 @@
           </div>
 
           <div class="card card-stats">
-            <div class="card-body">
+            <div :class="setor_uang > 0 ? 'card-body bg-lighter' : 'card-body'">
               <router-link to="/setoran-uang">
                 <div class="row">
                   <div class="col">
                     <h5 class="card-title text-uppercase text-muted mb-0">
-                      Setoran uang yang perlu diverifikasi
+                      Verifikasi Setoran Sopir
                     </h5>
                     <span class="h2 font-weight-bold mb-0">
                       {{ "Rp " + formatNumber(setor_uang) }}
@@ -187,12 +188,14 @@
           </div>
 
           <div class="card card-stats">
-            <div class="card-body">
+            <div
+            :class="kembali_orders.filter(it => it.detail_kembali_orders.length > 0).length > 0 ?
+            'card-body bg-lighter' : 'card-body'">
               <router-link to="/verify-kembali-orders">
                 <div class="row">
                   <div class="col">
                     <h5 class="card-title text-uppercase text-muted mb-0">
-                      Verifikasi Pengurangan Order
+                      Verifikasi Pengembalian Order
                     </h5>
                     <h4 class="font-weight-bold mb-0">
                       <div v-for="b in kembali_orders">
@@ -270,7 +273,7 @@
     </div>
 
     <div class="card-footer">
-      <h2>Grafik Order</h2>
+      <h2>Grafik Omset</h2>
       <form v-on:submit.prevent="generateChart">
         <b-row class="mb-2">
           <b-col cols="5">

@@ -24,6 +24,10 @@
           v-b-modal.modal_lock>
             <span class="fa fa-unlock-alt"></span> Lock Barang
           </b-button>
+          <b-button variant="primary"
+          @click="getTanggungan(data.item.id_users)" size="sm">
+            <span class="fa fa-refresh"></span> Reset Tanggungan
+          </b-button>
         </template>
         <template v-slot:cell(nama)="data">
           <img :src="storage_path + data.item.image"
@@ -61,6 +65,80 @@
       <strong class="text-success">Loading...</strong>
     </b-toast>
     <!-- Modal Component -->
+
+    <b-modal id="modal_reset" title="Reset Tanggungan Customer"
+    header-bg-variant="info" size="lg"
+    border-variant="info" hide-footer>
+      <b-container fluid>
+        <form v-on:submit.prevent="ResetTanggungan">
+          <h4>Tanggungan Pack</h4>
+          <ul class="list-group mb-2">
+            <li class="list-group-item">
+              <b-row>
+                <b-col cols="6">Pack</b-col>
+                <b-col cols="4">Jumlah</b-col>
+                <b-col cols="2">
+                  <b-button variant="success" size="sm" @click="addPack">
+                    <span class="fa fa-plus"></span>
+                  </b-button>
+                </b-col>
+              </b-row>
+            </li>
+            <li class="list-group-item" v-for="(item,i) in tanggungan.tanggungan_pack">
+              <b-row>
+                <b-col cols="6">
+                  <b-form-select v-model="item.id_pack" size="sm" required>
+                    <option v-for="p in pack" :value="p.id_pack">{{ p.nama_pack }}</option>
+                  </b-form-select>
+                </b-col>
+                <b-col cols="4">
+                  <b-form-input v-model="item.jumlah" size="sm" required />
+                </b-col>
+                <b-col cols="2">
+                  <b-button variant="danger" size="sm" @click="removePack(i)">
+                    <span class="fa fa-trash"></span>
+                  </b-button>
+                </b-col>
+              </b-row>
+            </li>
+          </ul>
+          <h4>Tanggungan Pembayaran</h4>
+          <ul class="list-group mb-2">
+            <li class="list-group-item">
+              <b-row>
+                <b-col cols="6">Tagihan</b-col>
+                <b-col cols="4">Nominal</b-col>
+                <b-col cols="2">
+                  <b-button variant="success" size="sm" @click="addBill">
+                    <span class="fa fa-plus"></span>
+                  </b-button>
+                </b-col>
+              </b-row>
+            </li>
+            <li class="list-group-item" v-for="(item,i) in tanggungan.tanggungan_pembayaran">
+              <b-row>
+                <b-col cols="6">
+                  {{ "Bill " + (Number(i) + 1) }}
+                </b-col>
+                <b-col cols="4">
+                  <b-form-input v-model="item.nominal" size="sm" required />
+                </b-col>
+                <b-col cols="2">
+                  <b-button variant="danger" size="sm" @click="removeBill(i)">
+                    <span class="fa fa-trash"></span>
+                  </b-button>
+                </b-col>
+              </b-row>
+            </li>
+          </ul>
+          <b-button type="submit" variant="success" class="mt-1" block>
+            <span class="fa fa-check"></span> Simpan
+          </b-button>
+        </form>
+      </b-container>
+    </b-modal>
+
+
     <b-modal id="modal_lock" title="Lock Barang dan Pack"
     header-bg-variant="info" size="lg"
     border-variant="info" hide-footer>
@@ -185,6 +263,10 @@
          <b-form-input v-model="users.jatuh_tempo" type="number" class="mb-1" required>
          </b-form-input>
 
+         Inisial Customer
+         <b-form-input v-model="users.inisial" class="mb-1" required>
+         </b-form-input>
+
          <b-button type="submit" variant="success" size="md" class="pull-right">
             <span class="fa fa-check"></span> Simpan
           </b-button>
@@ -198,6 +280,7 @@
     data: function(){
       return {
         fields: ["nama","alamat","contact","option"],
+        pack: [],
         action: "",
         users: {
           id_users: "",
@@ -216,6 +299,7 @@
           bidang_usaha: "",
           id_group_customer: "",
           jatuh_tempo: 0,
+          inisial: "",
         },
         search : "",
         message: "",
@@ -227,15 +311,92 @@
         key: "",
         selectedLockPackBarang: [],
         barang: [],
+        tanggungan: {
+          tanggungan_pembayaran: [],
+          tanggungan_pack: []
+        }
       }
     },
 
     methods: {
+      get_pack : function(){
+        let conf = { headers: { "Api-Token" : this.key} };
+        axios.get(base_url + "/pack", conf)
+        .then(response => {
+          this.pack = response.data.pack;
+        })
+        .catch(error => {
+          console.log(error);
+        })
+      },
+
+      getTanggungan : function(id){
+        this.$bvToast.show("loading");
+        this.users.id_users = id;
+        let conf = { headers: { "Api-Token" : this.key} };
+        axios.get(base_url + "/customer-tanggungan/" + id, conf)
+        .then(response => {
+          this.$bvToast.hide("loading");
+          this.tanggungan.tanggungan_pack = response.data.tanggungan_pack;
+          this.tanggungan.tanggungan_pembayaran = response.data.tanggungan_pembayaran;
+          this.$bvModal.show("modal_reset");
+        })
+        .catch(error => {
+          console.log(error);
+        })
+      },
+
+      addBill : function(){
+        this.tanggungan.tanggungan_pembayaran.push({
+          id_bill: "BILL" + new Date().getTime(),
+          id_orders: "IDO" + new Date().getTime(),
+          nominal: "0",
+          status: "1"
+        });
+      },
+
+      removeBill : function(index){
+        this.tanggungan.tanggungan_pembayaran.splice(index, 1);
+      },
+
+      addPack : function(){
+        this.tanggungan.tanggungan_pack.push({
+          id_pack: "",
+          jumlah: "0"
+        });
+      },
+
+      removePack : function(index){
+        this.tanggungan.tanggungan_pack.splice(index, 1);
+      },
+
+      ResetTanggungan : function(){
+        if (confirm("Apakah Anda yakin ingin mereset data ini?")) {
+          this.$bvModal.hide("modal_reset");
+          this.$bvToast.show("loading");
+          let conf = { headers: { "Api-Token" : this.key} };
+          let form = new FormData();
+          form.append("id_users", this.users.id_users);
+          form.append("tanggungan_pack", JSON.stringify(this.tanggungan.tanggungan_pack));
+          form.append("tanggungan_pembayaran",
+          JSON.stringify(this.tanggungan.tanggungan_pembayaran));
+
+          axios.post(base_url + "/customer-tanggungan", form, conf)
+          .then(response => {
+            this.$bvToast.hide("loading");
+            this.message = response.data.message;
+            this.$bvToast.show("message");
+          })
+          .catch(error => console.log(error));
+        }
+      },
+
       get_group_customer : function() {
         let conf = { headers: { "Api-Token" : this.key} };
         axios.get(base_url+"/group_customer", conf)
         .then(response => {
           this.group_customer = response.data.group_customer;
+          this.get_pack();
         })
         .catch(error => {
           console.log(error);
@@ -247,6 +408,7 @@
         axios.get(base_url+"/barang", conf)
         .then(response => {
           this.barang = response.data.barang;
+          this.get_group_customer();
         })
         .catch(error => {
           console.log(error);
@@ -354,6 +516,7 @@
         this.users.nama_instansi = "";
         this.users.margin = 0;
         this.users.bidang_usaha = "";
+        this.users.inisial = "";
         this.users.jatuh_tempo = 0;
         this.users.id_group_customer =
         (this.group_customer.length) ? this.group_customer[0].id_group_customer : "";
@@ -376,6 +539,7 @@
         this.users.bidang_usaha = item.bidang_usaha;
         this.users.id_group_customer = item.id_group_customer;
         this.users.jatuh_tempo = item.jatuh_tempo;
+        this.users.inisial = item.inisial;
       },
 
       Save : function(){
@@ -397,6 +561,7 @@
         form.append("nama_instansi", this.users.nama_instansi);
         form.append("bidang_usaha", this.users.bidang_usaha);
         form.append("jatuh_tempo", this.users.jatuh_tempo);
+        form.append("inisial", this.users.inisial);
         form.append("id_group_customer", this.users.id_group_customer);
 
         let useUrl = "";
@@ -439,7 +604,6 @@
 
     mounted(){
       this.get_users();
-      this.get_group_customer();
     }
   }
 </script>

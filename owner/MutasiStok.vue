@@ -2,7 +2,7 @@
   <div class="card">
     <div class="card-header">
       <h3>
-        <span class="fa fa-list"></span> Mutasi Stok
+        <span class="fa fa-list"></span> Mutasi Barang
       </h3>
     </div>
     <div class="card-body">

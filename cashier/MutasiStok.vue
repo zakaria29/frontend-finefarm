@@ -2,7 +2,7 @@
   <div class="card">
     <div class="card-header">
       <h3>
-        <span class="fa fa-list"></span> Mutasi Stok
+        <span class="fa fa-list"></span> Mutasi Barang
       </h3>
     </div>
     <div class="card-body">
@@ -81,7 +81,7 @@
           <template v-slot:cell(loss)="data">
             {{ (data.item.loss > 0 || data.item.loss === null) ? data.item.loss : "-" }}
           </template>
-          <template v-slot:cell(stok)="data">
+          <template v-slot:cell(stok_akhir)="data">
             <strong class="text-info">
               {{ Number(data.item.stok)-Number(data.item.keluar)+Number(data.item.masuk) }}
             </strong>
@@ -98,7 +98,7 @@
       return {
         users: null,
         mutasi: [],
-        fields:["waktu","masuk","keluar","loss","stok"],
+        fields:["waktu","masuk","keluar","loss","stok_akhir"],
         message : "",
         barang: [],
         supplier: [],

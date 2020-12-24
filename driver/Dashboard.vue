@@ -49,7 +49,7 @@
 
         <div class="col-xl-4 col-md-6">
           <div class="card card-stats">
-            <div class="card-body">
+            <div :class="kirim_order > 0 ? 'card-body bg-lighter' : 'card-body'">
               <router-link to="/deliver">
                 <div class="row">
                   <div class="col">
@@ -69,7 +69,7 @@
           </div>
 
           <div class="card card-stats">
-            <div class="card-body">
+            <div :class="delivered_order > 0 ? 'card-body bg-lighter' : 'card-body'">
               <router-link to="/delivered">
                 <div class="row">
                   <div class="col">
@@ -91,7 +91,8 @@
           </div>
 
           <div class="card card-stats">
-            <div class="card-body">
+            <div :class="prepare_barang.filter(it => it.log_get_supplier.length > 0) > 0 ?
+            'card-body bg-lighter' : 'card-body'">
               <div class="row">
                 <div class="col">
                   <h5 class="card-title text-uppercase text-muted mb-0">
@@ -124,7 +125,8 @@
           </div>
 
           <div class="card card-stats">
-            <div class="card-body">
+            <div :class="prepare_pack.filter(it => it.detail_orders.length > 0) > 0 ?
+            'card-body bg-lighter' : 'card-body'">
               <div class="row">
                 <div class="col">
                   <h5 class="card-title text-uppercase text-muted mb-0">
@@ -154,7 +156,7 @@
         <div class="col-xl-4 col-md-6">
 
           <div class="card card-stats">
-            <div class="card-body">
+            <div :class="setor_uang > 0 ? 'card-body bg-lighter' : 'card-body'">
               <router-link to="/setoran-uang">
                 <div class="row">
                   <div class="col">
@@ -177,7 +179,8 @@
 
           <!-- tanggungan pack -->
           <div class="card card-stats">
-            <div class="card-body">
+            <div :class="kembali_pack.filter(it => it.kembali_pack.length > 0) > 0 ?
+            'card-body bg-lighter' : 'card-body'">
               <router-link to="/setoran-pack">
                 <div class="row">
                   <div class="col">
@@ -205,7 +208,8 @@
           </div>
 
           <div class="card card-stats">
-            <div class="card-body">
+            <div :class="kembali_orders.filter(it => it.detail_kembali_orders.length > 0) > 0 ?
+            'card-body bg-lighter' : 'card-body'">
               <div class="row">
                 <div class="col">
                   <h5 class="card-title text-uppercase text-muted mb-0">
