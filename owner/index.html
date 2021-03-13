@@ -125,6 +125,9 @@
                         <router-link class="dropdown-item" to="/supplier">
                           <i class="fa fa-people-carry"></i> Supplier
                         </router-link>
+                        <router-link class="dropdown-item" to="/group_customer">
+                          <i class="fa fa-users"></i> Group Customer
+                        </router-link>
                       </div>
                   </li>
 
@@ -284,6 +287,7 @@
       { path: "/owner", name: "Owner", component: httpVueLoader("Owner.vue")},
       { path: "/cashier", name: "Cashier", component: httpVueLoader("Cashier.vue")},
       { path: "/customer", name: "Customer", component: httpVueLoader("Customer.vue")},
+      { path: "/group_customer", name: "GroupCustomer", component: httpVueLoader("GroupCustomer.vue")},
       { path: "/sopir", name: "Sopir", component: httpVueLoader("Sopir.vue")},
       { path: "/supplier", name: "Supplier", component: httpVueLoader("Supplier.vue")},
       { path: "/barang", name: "Product", component: httpVueLoader("Barang.vue")},

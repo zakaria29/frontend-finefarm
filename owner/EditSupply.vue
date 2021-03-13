@@ -168,6 +168,9 @@
             }
           });
 
+          this.supply.id_supply = this.$route.params.id_supply;
+          this.get_supply();
+
         })
         .catch(error => {
           alert(error);
@@ -178,7 +181,8 @@
         let conf = { headers: { "Api-Token" : this.key} };
         axios.get(base_url + "/supplier", conf)
         .then(response => {
-          this.supplier = response.data.supplier;
+          this.supplier = response.data;
+          this.get_barang();
         })
         .catch(error => {
           alert(error);
@@ -253,9 +257,7 @@
 
     mounted(){
       this.get_supplier();
-      this.get_barang();
-      this.supply.id_supply = this.$route.params.id_supply;
-      this.get_supply();
+
     }
   }
 </script>

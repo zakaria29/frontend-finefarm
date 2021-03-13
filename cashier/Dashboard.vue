@@ -329,7 +329,8 @@
           username: "",
           password: "",
           changePassword: false
-        }
+        },
+        currentUpdate: "",
       }
     },
 
@@ -460,7 +461,7 @@
           this.kembali_pack = response.data.kembali_pack;
           this.setor_uang = response.data.setor_uang;
           this.kembali_orders = response.data.kembali_orders;
-
+          this.currentUpdate = response.data.currentUpdate;
           this.generateChart();
         })
         .catch(error => {

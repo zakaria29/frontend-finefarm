@@ -222,9 +222,9 @@
                     />
                   </template>
                   </v-select>
-                  <small v-if="it.id_supplier !== null">
+                  <strong v-if="it.id_supplier !== null">
                     Stok: {{ it.max }}
-                  </small>
+                  </strong>
                 </b-col>
                 <b-col cols="4">
                    <b-form-input type="number"

@@ -51,8 +51,6 @@
           <b-row>
             <b-col cols="3">Modal</b-col>
             <b-col cols="9">: {{ "Rp " + formatNumber(summary.modal) }}</b-col>
-            <b-col cols="3">Total Orders</b-col>
-            <b-col cols="9">: {{ "Rp " + formatNumber(summary.totalOrders) }}</b-col>
             <b-col cols="3">Cash</b-col>
             <b-col cols="9">: {{ "Rp " + formatNumber(summary.cash) }}</b-col>
             <b-col cols="3">Piutang</b-col>
@@ -62,10 +60,20 @@
         <b-col>
           <h4 class="mt-2">Produk yang terjual</h4>
           <b-row v-for="b in summary.barang">
-            <b-col v-if="b.log_stok_barang.length > 0">{{ b.nama_barang }}</b-col>
-            <b-col v-if="b.log_stok_barang.length > 0">
+            <b-col cols="4" v-if="b.log_stok_barang.length > 0">{{ b.nama_barang }}</b-col>
+            <b-col cols="3" v-if="b.log_stok_barang.length > 0">
               : {{ b.log_stok_barang[0].jumlah + " " }}
               {{ (b.satuan === "1") ? "Kg" : "Butir" }}
+            </b-col>
+            <b-col cols="5" v-if="b.log_stok_barang.length > 0">
+              ({{ "Rp " + formatNumber(b.log_stok_barang[0].detail_orders[0].total) }})
+            </b-col>
+          </b-row>
+          <hr />
+          <b-row>
+            <b-col cols="4"><strong>Total Orders</strong></b-col>
+            <b-col cols="8" class="text-right">
+              <strong>{{ "Rp " + formatNumber(summary.totalOrders) }}</strong>
             </b-col>
           </b-row>
         </b-col>
@@ -112,10 +120,10 @@
                 <span class="fa fa-edit"></span> Edit Order
               </b-button>
 
-              <b-button size="sm" class="btn btn-block btn-sm btn-success" v-b-modal.modal_detail
+              <!-- <b-button size="sm" class="btn btn-block btn-sm btn-success" v-b-modal.modal_detail
               @click="Detail(item)">
                 <span class="fa fa-eye"></span> Detail Order
-              </b-button>
+              </b-button> -->
 
               <b-button size="sm" class="btn btn-block btn-sm btn-warning" v-b-modal.modal_log
               @click="LogOrder(item)">
@@ -147,6 +155,37 @@
               <b-badge class="bg-orange text-white">
                 {{ item.kendala }}
               </b-badge>
+            </b-col>
+          </b-row>
+
+          <b-row class="my-2">
+            <b-col>
+              <ul class="list-group">
+                <li class="list-group-item" v-for="it in item.detail_orders">
+                  <b-row>
+                    <b-col cols="3">
+                      <small class="text-info">Nama Barang</small>
+                      <h4>{{ it.barang.nama_barang }}</h4>
+                    </b-col>
+                    <b-col cols="3">
+                      <small class="text-info">Qty</small>
+                      <h4>
+                        {{ it.jumlah_barang }} {{ it.barang.satuan === '1' ? 'Kg' : 'Butir' }} <br />
+                        <i class="text-primary">[{{ it.pack.nama_pack }} : {{ it.jumlah_pack }} item]</i>
+                      </h4>
+                    </b-col>
+                    <b-col cols="3">
+                      <small class="text-info">Harga</small>
+                      <h4>{{ "Rp " + formatNumber(it.harga_beli) }}</h4>
+                    </b-col>
+                    <b-col cols="3">
+                      <small class="text-info">Total</small>
+                      <h4>{{ "Rp " + formatNumber(it.harga_beli * it.jumlah_barang) }}</h4>
+                    </b-col>
+
+                  </b-row>
+                </li>
+              </ul>
             </b-col>
           </b-row>
         </li>

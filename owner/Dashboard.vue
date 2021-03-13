@@ -92,7 +92,7 @@
               <div class="row">
                 <div class="col">
                   <h5 class="card-title text-uppercase text-muted mb-0">
-                    Harga Barang Terbaru
+                    Update Harga <strong class="text-info">{{ currentUpdate }}</strong> 
                   </h5>
                   <h4 class="font-weight-bold mb-0">
                     <div v-for="b in hargaBarang">
@@ -199,6 +199,7 @@
         hargaBarang: [],
         stokBarang: [],
         pengguna: [],
+        currentUpdate: "",
       }
     },
 
@@ -292,7 +293,7 @@
           this.hargaBarang = response.data.harga_barang;
           this.stokBarang = response.data.stok_barang;
           this.pengguna = response.data.pengguna;
-
+          this.currentUpdate = formatDate(response.data.currentUpdate);
           this.generateChart();
         })
         .catch(error => {

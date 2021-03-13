@@ -2,128 +2,63 @@
   <div class="card">
     <div class="card-header">
       <h3>
-        <span class="fa fa-list"></span> Data Order
+        <span class="fa fa-list"></span> Data Retur Order
       </h3>
     </div>
     <div class="card-body">
       <h4>Filter Data</h4>
       <form v-on:submit.prevent="find">
         <div class="row mb-2">
-          <div class="col-2">
+          <div class="col-3">
             Start Date
              <b-form-input v-model="from" type="date" required>
              </b-form-input>
           </div>
-          <div class="col-2">
+          <div class="col-3">
             End Date
              <b-form-input v-model="to" type="date" required>
-             </b-form-input>
-          </div>
-          <div class="col-5">
-            Pencarian
-             <b-form-input v-model="search" type="text" placeholder="Kata Kunci">
              </b-form-input>
           </div>
           <div class="col-3">
             <br />
             <b-button type="submit" class="btn btn-info">
-              <span class="fa fa-search"></span> Cari
+              <span class="fa fa-search"></span> Tampilkan
             </b-button>
-            <b-button v-if="orders.length > 0" class="btn btn-success" @click="exportsExcel">
+            <!-- <b-button v-if="orders.length > 0" class="btn btn-success" @click="exportsExcel">
               <span class="fa fa-file-excel"></span> Export Excel
-            </b-button>
+            </b-button> -->
           </div>
         </div>
       </form>
       <hr />
 
-      <div class="mt-1">
-        <b-button size="md" v-b-modal.modal_kuitansi
-        v-b-tooltip.hover title="Buat Kuitansi" class="bg-red text-white"
-        >
-          <span class="fa fa-sticky-note"></span> Buat Kuitansi
-        </b-button>
-      </div>
-
-      <b-row id="summary" class="mt-2">
-        <b-col>
-          <h4 class="mt-2">Summary</h4>
-          <b-row>
-            <b-col cols="3">Modal</b-col>
-            <b-col cols="9">: {{ "Rp " + formatNumber(summary.modal) }}</b-col>
-            <b-col cols="3">Cash</b-col>
-            <b-col cols="9">: {{ "Rp " + formatNumber(summary.cash) }}</b-col>
-            <b-col cols="3">Piutang</b-col>
-            <b-col cols="9">: {{ "Rp " + formatNumber(summary.piutang) }}</b-col>
-          </b-row>
-        </b-col>
-        <b-col>
-          <h4 class="mt-2">Produk yang terjual</h4>
-          <b-row v-for="b in summary.barang">
-            <b-col cols="4" v-if="b.log_stok_barang.length > 0">{{ b.nama_barang }}</b-col>
-            <b-col cols="3" v-if="b.log_stok_barang.length > 0">
-              : {{ b.log_stok_barang[0].jumlah + " " }}
-              {{ (b.satuan === "1") ? "Kg" : "Butir" }}
-            </b-col>
-            <b-col class="text-right" cols="5" v-if="b.log_stok_barang.length > 0">
-              ({{ "Rp " + formatNumber(b.log_stok_barang[0].detail_orders[0].total) }})
-            </b-col>
-          </b-row>
-          <hr />
-          <b-row>
-            <b-col cols="4"><strong>Total Orders</strong></b-col>
-            <b-col cols="8" class="text-right">
-              <strong>{{ "Rp " + formatNumber(summary.totalOrders) }}</strong>
-            </b-col>
-          </b-row>
-        </b-col>
-      </b-row>
-      <hr />
-
       <h4 class="mt-2">List Order</h4>
       <ul class="list-group mt-2">
-        <li class="list-group-item mb-2" v-for="item in orders">
+        <li class="list-group-item mb-2" v-for="item in retur_orders">
           <b-row>
             <b-col cols="5">
-              <h4>ID Order: {{ item.id_orders }}</h4>
+              <h4>ID Order: {{ item.id_retur_orders }}</h4>
               <h4>Waktu Order: {{ formatDateTime(item.waktu_order) }}</h4>
               <h4>Waktu Kirim: {{ formatDate(item.waktu_pengiriman) }}</h4>
-              <b-row>
-                <b-col>
-                  <h3 class="text-info">
-                    Total: Rp {{ formatNumber(item.total_bayar) }}
-
-                    <b-badge pill variant="success"
-                    v-if="item.tagihan !== null && item.tagihan.status === '2'">
-                      <strong>Lunas</strong>
-                    </b-badge>
-                    <b-badge pill variant="warning"
-                    v-if="item.tagihan !== null && item.tagihan.status === '0'">
-                      <strong>Menunggu Verifikasi Pembayaran</strong>
-                    </b-badge>
-                    <b-badge pill variant="danger"
-                    v-if="item.tagihan !== null && item.tagihan.status === '1'">
-                      <strong>Belum Lunas</strong>
-                    </b-badge>
-                  </h3>
-                </b-col>
-              </b-row>
+              <h3 class="text-info">
+                Total: Rp {{ formatNumber(item.total_bayar) }}
+              </h3>
             </b-col>
             <b-col cols="5">
               <h4>Customer: {{ item.pembeli.nama }}</h4>
               <h4>Kasir: {{ item.users === null ? "-" : item.users.nama }}</h4>
               <h4>Sopir: {{ item.sopir === null ? "-" : item.sopir.nama }}</h4>
             </b-col>
-            <b-col>
+            <!-- <b-col>
               <b-button size="sm" class="btn btn-block btn-sm btn-info" v-if="(item.id_status_orders < 3)"
               @click="Edit(item.id_orders)">
                 <span class="fa fa-edit"></span> Edit Order
               </b-button>
 
-              <!-- <b-button size="sm" class="btn btn-block btn-sm btn-success" v-b-modal.modal_detail
+              <b-button size="sm" class="btn btn-block btn-sm btn-success" v-b-modal.modal_detail
               @click="Detail(item)">
                 <span class="fa fa-eye"></span> Detail Order
-              </b-button> -->
+              </b-button>
 
               <b-button size="sm" class="btn btn-block btn-sm btn-warning" v-b-modal.modal_log
               @click="LogOrder(item)">
@@ -134,21 +69,21 @@
               @click="Print(item)">
                 <span class="fa fa-print"></span> Struk Order
               </b-button>
-            </b-col>
+            </b-col> -->
           </b-row>
           <b-row class="my-1" v-if="item.catatan !== ''">
             <b-col>
               Catatan: {{ item.catatan }}
             </b-col>
           </b-row>
-          <b-row>
+          <!-- <b-row>
             <b-col>
               Status Order:
               <b-badge pill class="text-dark" :variant="type[item.id_status_orders]">
                 {{ item.status_orders.nama_status_order }}
               </b-badge>
             </b-col>
-          </b-row>
+          </b-row> -->
           <b-row class="my-1" v-if="item.kendala !== ''">
             <b-col>
               Kendala Pengiriman:
@@ -161,7 +96,7 @@
           <b-row class="my-2">
             <b-col>
               <ul class="list-group">
-                <li class="list-group-item" v-for="it in item.detail_orders">
+                <li class="list-group-item" v-for="it in item.detail_retur_order">
                   <b-row>
                     <b-col cols="3">
                       <small class="text-info">Nama Barang</small>
@@ -328,7 +263,7 @@
       return {
         message : "",
         key: "",
-        orders: [],
+        retur_orders: [],
         customer: [],
         detail_orders: [],
         log_orders: [],
@@ -433,23 +368,10 @@
         form.append("find", this.search);
         let offset = (this.currentPage-1) * this.perPage;
 
-        axios.post(base_url + "/orders/" + this.perPage + "/" + offset, form, conf)
+        axios.post(base_url + "/retur_orders/" + this.perPage + "/" + offset, form, conf)
         .then(response => {
-          this.orders = response.data.orders;
+          this.retur_orders = response.data.retur_orders;
           this.totalRow = response.data.count;
-
-          axios.post(base_url + "/summary-orders", form, conf)
-          .then(response => {
-            this.summary.totalOrders = response.data.total_orders;
-            this.summary.cash = response.data.cash;
-            this.summary.modal = response.data.modal;
-            this.summary.piutang = response.data.piutang;
-            this.summary.barang = response.data.barang;
-          })
-          .catch(error => {
-            console.log(error);
-          })
-
         })
         .catch(error => {
           console.log(error);
@@ -465,7 +387,7 @@
       this.to = currentDate;
       let lastMonth = new Date(date.getFullYear(), date.getMonth()-1, date.getDate());
       this.from = lastMonth.toISOString().slice(0,10);
-      this.get_customer();
+      this.find();
     }
   }
 </script>

@@ -103,6 +103,7 @@
             <template #search="{attributes, events}">
               <input
                 class="vs__search"
+                :required="!orders.id_sopir"
                 v-bind="attributes"
                 v-on="events"
               />
@@ -143,6 +144,10 @@
                  @click="() => {d.is_lock = !d.is_lock; SelectBarang(d.id_barang, index)}">
                    {{ d.is_lock ? "Pakai Harga Saat ini" : "Pakai Harga Lock" }}
                  </b-button>
+                 <b-button block size="sm" variant="dark" v-else
+                 @click="SelectBarang(d.id_barang, index)">
+                   Set Harga Saat ini
+                 </b-button>
                 </div>
 
                 <div class="col-4">
@@ -164,7 +169,7 @@
                 </div>
                 <div class="col-2">
                   Jumlah Pack
-                  <b-form-input v-model="d.jumlah_pack" type="number" required>
+                  <b-form-input v-model="d.jumlah_pack" type="number" min="1" required>
                   </b-form-input>
                 </div>
 
@@ -173,7 +178,7 @@
                   <br />
                    <b-form-checkbox v-model="d.harga_pack" switch @click="BeliPack(index)"
                    :value="d.beli_pack" unchecked-value="">
-                    {{ (d.harga_pack) ? "Beli Pack" : "Pinjam Pack" }}
+                    {{ (d.harga_pack > 0) ? "Beli Pack" : "Pinjam Pack" }}
                   </b-form-checkbox>
                 </div>
               </div>
@@ -188,11 +193,14 @@
 
         <div class="row mb-2">
           <div class="col-8">
-
+            <h2>Total</h2>
           </div>
           <div class="col-4">
-            <h2>Total: Rp {{ formatNumber(CountTotal()) }}</h2>
-            <br />
+            <!-- <h2>Rp {{ formatNumber(CountTotal()) }}</h2>
+            <br /> -->
+            <input type="number" class="form-control"
+            v-model="orders.total_bayar" />
+            <!-- {{ orders.total_bayar }} -->
           </div>
 
         </div>
@@ -249,6 +257,7 @@
           id_users: "",
           id_pembeli: "",
           id_sopir: "",
+          id_status_orders: "",
           date_order: "",
           time_order: "",
           waktu_pengiriman: "",
@@ -297,6 +306,7 @@
           }
         }
         this.detail_order[index].id_pack = item.pack[0].id_pack;
+        this.CountTotal();
       },
 
       SelectPack : function(index){
@@ -312,17 +322,18 @@
         }
         this.detail_order[index].beli_pack = item.harga;
         this.BeliPack(index);
-
+        this.CountTotal();
       },
 
       BeliPack : function(index){
-        if (this.detail_order[index].harga_pack) {
+        if (this.detail_order[index].harga_pack > 0) {
           let id_pack = this.detail_order[index].id_pack;
           let pack = this.detail_order[index].pack.find(it => it.id_pack === id_pack);
           this.detail_order[index].harga_pack = pack.harga;
         }else{
           this.detail_order[index].harga_pack = 0;
         }
+        this.CountTotal();
       },
 
       Customer : function(){
@@ -353,7 +364,7 @@
           (Number(item.harga_pack) * Number(item.jumlah_pack));
         });
         this.orders.total_bayar = total;
-        return total;
+        // return total;
       },
 
       Tipe : function(){
@@ -408,6 +419,7 @@
             form.append("po", this.orders.po);
             form.append("invoice", this.orders.invoice);
             form.append("catatan", this.orders.catatan);
+            form.append("verify", this.orders.id_status_orders === '1' ? true : false);
             form.append("detail_orders", JSON.stringify(this.detail_order));
 
             axios.post(base_url + "/orders/update_order", form, conf)
@@ -454,10 +466,11 @@
           this.margin =  response.data.orders.margin;
           this.margin_group = response.data.orders.margin_group;
           this.detail_order = response.data.orders.detail_orders;
-          this.orders.id_users =  response.data.orders.id_users === null ?
-          null : this.users.id_users;
+          // this.orders.id_users =  response.data.orders.id_users === null ?
+          // null : this.users.id_users;
           this.orders.id_pembeli =  response.data.orders.id_pembeli;
           this.orders.id_sopir =  response.data.orders.id_sopir;
+          this.orders.id_status_orders = response.data.orders.id_status_orders;
 
           this.orders.waktu_pengiriman =  response.data.orders.waktu_pengiriman;
           this.orders.tgl_jatuh_tempo =  response.data.orders.tgl_jatuh_tempo;
@@ -496,6 +509,7 @@
           } else{
             this.key = token;
             this.users = response.data.cashier;
+            this.orders.id_users = response.data.cashier.id_users;
             this.get_order();
           }
         })

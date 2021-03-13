@@ -33,7 +33,7 @@
                 <h3 class="text-info">Total: Rp {{ formatNumber(item.orders.total_bayar) }}</h3>
               </b-col>
               <b-col>
-                <b-button varint="primary" size="sm" block v-b-modal.modal_verify
+                <b-button class="btn btn-info" size="md" block v-b-modal.modal_verify
                 @click="Verify(item)">
                   <span class="fa fa-check"></span> Verifikasi
                 </b-button>
@@ -63,11 +63,14 @@
                 <ul class="list-group">
                   <li class="list-group-item">
                     <b-row>
-                      <b-col cols="6">
+                      <b-col cols="3">
                         <small class="text-success"><i>Nama Barang</i></small>
                       </b-col>
                       <b-col cols="3">
-                        <small class="text-danger"><i>Dikembalikan Sebanyak</i></small>
+                        <small class="text-danger"><i>Barang Dikembalikan Sebanyak</i></small>
+                      </b-col>
+                      <b-col cols="3">
+                        <small class="text-danger"><i>Pack Dikembalikan Sebanyak</i></small>
                       </b-col>
                       <b-col>
                         <small class="text-warning"> <i>Supplier</i> </small>
@@ -76,9 +79,17 @@
                   </li>
                   <li class="list-group-item" v-for="b in selectedKembaliOrders">
                     <b-row>
-                      <b-col cols="6">{{ b.nama_barang }}</b-col>
+                      <b-col cols="3">
+                        <strong>{{ b.nama_barang }}</strong>
+                        <h5>Pack: {{ b.nama_pack }}</h5>
+                      </b-col>
                       <b-col cols="3">
                         <b-form-input type="number" v-model="b.jumlah_barang"
+                         size="sm">
+                        </b-form-input>
+                      </b-col>
+                      <b-col cols="3">
+                        <b-form-input type="number" v-model="b.jumlah_pack"
                          size="sm">
                         </b-form-input>
                       </b-col>
@@ -160,7 +171,11 @@
             id_barang: it.id_barang,
             jumlah_barang: it.jumlah_barang,
             id_supplier: "",
-            nama_barang: it.barang.nama_barang
+            nama_barang: it.barang.nama_barang,
+            id_pack: it.id_pack,
+            jumlah_pack: it.jumlah_pack,
+            nama_pack: it.pack.nama_pack,
+            satuan: it.barang.satuan === '1' ? 'Kg' : 'butir',
           })
         });
         ;

@@ -42,10 +42,10 @@
                 <span class="fa fa-check"></span> Order Diterima
               </b-button>
 
-              <b-button class="btn btn-block btn-sm btn-success" v-b-modal.modal_detail
+              <!-- <b-button class="btn btn-block btn-sm btn-success" v-b-modal.modal_detail
               @click="Detail(item)">
                 <span class="fa fa-eye"></span> Detail Order
-              </b-button>
+              </b-button> -->
 
               <b-button class="btn btn-block btn-sm btn-warning" v-b-modal.modal_log
               @click="LogOrder(item)">
@@ -77,6 +77,37 @@
               <b-badge class="bg-orange text-white">
                 {{ item.kendala }}
               </b-badge>
+            </b-col>
+          </b-row>
+
+          <b-row class="my-2">
+            <b-col>
+              <ul class="list-group">
+                <li class="list-group-item" v-for="it in item.detail_orders">
+                  <b-row>
+                    <b-col cols="3">
+                      <small class="text-info">Nama Barang</small>
+                      <h4>{{ it.barang.nama_barang }}</h4>
+                    </b-col>
+                    <b-col cols="3">
+                      <small class="text-info">Qty</small>
+                      <h4>
+                        {{ it.jumlah_barang }} {{ it.barang.satuan === '1' ? 'Kg' : 'Butir' }} <br />
+                        <i class="text-primary">[{{ it.pack.nama_pack }} : {{ it.jumlah_pack }} item]</i>
+                      </h4>
+                    </b-col>
+                    <b-col cols="3">
+                      <small class="text-info">Harga</small>
+                      <h4>{{ "Rp " + formatNumber(it.harga_beli) }}</h4>
+                    </b-col>
+                    <b-col cols="3">
+                      <small class="text-info">Total</small>
+                      <h4>{{ "Rp " + formatNumber(it.harga_beli * it.jumlah_barang) }}</h4>
+                    </b-col>
+
+                  </b-row>
+                </li>
+              </ul>
             </b-col>
           </b-row>
         </li>
@@ -190,7 +221,7 @@
       header-bg-variant="success" size="lg"
       border-variant="info" hide-footer>
       <form v-on:submit.prevent="DeliveredOrder">
-        <b-container fluid v-if="selectedOrder !== null">
+        <b-container fluid v-if="selectedOrder !== null" style="height:450px;overflow:auto">
           <b-row class="mb-1">
             <b-col cols="4">Customer</b-col>
             <b-col>: {{ selectedOrder.pembeli.nama }}</b-col>
@@ -228,23 +259,30 @@
               <ul class="list-group">
                 <li class="list-group-item">
                   <b-row>
-                    <b-col cols="6"><small class="text-success"><i>Nama Barang</i></small></b-col>
-                    <b-col cols="3">
-                      <small class="text-info"><i>Jumlah Semula</i></small>
+                    <b-col cols="6">
+                      <small class="text-success"><i>Nama Barang</i></small>
                     </b-col>
                     <b-col cols="3">
-                      <small class="text-danger"><i>Dikembalikan sebanyak</i></small>
+                      <small class="text-info"><i>Barang Dikembalikan Sebanyak</i></small>
+                    </b-col>
+                    <b-col cols="3">
+                      <small class="text-danger"><i>Pack Dikembalikan sebanyak</i></small>
                     </b-col>
                   </b-row>
                 </li>
                 <li class="list-group-item" v-for="b in kembaliOrders">
                   <b-row>
-                    <b-col cols="6">{{ b.nama_barang }}</b-col>
-                    <b-col cols="3">
-                      {{ b.jumlah }}
+                    <b-col cols="6">
+                      <strong>{{ b.nama_barang +" (" + b.jumlah + " "+ b.satuan +  ")" }}</strong>
+                      <h5>Pack: {{ b.nama_pack +" ("+ b.jumlahPack +")"}}</h5>
                     </b-col>
                     <b-col cols="3">
                       <b-form-input type="number" v-model="b.jumlah_barang" :max="b.jumlah"
+                       size="sm">
+                      </b-form-input>
+                    </b-col>
+                    <b-col cols="3">
+                      <b-form-input type="number" v-model="b.jumlah_pack" :max="b.jumlahPack"
                        size="sm">
                       </b-form-input>
                     </b-col>
@@ -296,6 +334,53 @@
                     </b-col>
                   </b-row>
                 </li>
+              </ul>
+            </b-col>
+          </b-row>
+
+          <b-row class="mb-1">
+            <b-col>
+              <b-form-checkbox v-model="statusReturOrder" @change="toggleRetur">
+               Retur Order
+             </b-form-checkbox>
+            </b-col>
+          </b-row>
+
+          <b-row class="mb-2" v-if="statusReturOrder">
+            <b-col>
+              <ul class="list-group">
+                <li class="list-group-item">
+                  <b-row>
+                    <b-col cols="6"><small class="text-success"><i>Nama Barang</i></small></b-col>
+                    <b-col cols="3">
+                      <small class="text-info"><i>Jumlah Retur</i></small>
+                    </b-col>
+                    <b-col cols="3">
+                      <small class="text-danger"><i>Jml. Retur Pack</i></small>
+                    </b-col>
+                  </b-row>
+                </li>
+                <li class="list-group-item" v-for="b in returOrder">
+                  <b-row>
+                    <b-col cols="6">
+                      <strong>{{ b.nama_barang +" (" + b.jumlah + " "+ b.satuan +  ")" }}</strong>
+                      <h5>Pack: {{ b.nama_pack +" ("+ b.jumlahPack +")"}}</h5>
+                    </b-col>
+                    <b-col cols="3">
+                      <b-form-input type="number" v-model="b.jumlah_barang" :max="b.jumlah"
+                       size="sm">
+                      </b-form-input>
+                    </b-col>
+                    <b-col cols="3">
+                      <b-form-input type="number" v-model="b.jumlah_pack" :max="b.jumlahPack"
+                       size="sm">
+                      </b-form-input>
+                    </b-col>
+                  </b-row>
+                </li>
+                <br />
+                Keterangan Retur Order
+                <textarea v-model="keterangan_retur" class="form-control" rows="2"></textarea>
               </ul>
             </b-col>
           </b-row>
@@ -358,9 +443,12 @@
         setorUang: [],
         kembaliPack: [],
         kembaliOrders: [],
+        returOrder: [],
         statusSetorUang: false,
         statusKembaliPack: false,
         statusKembaliOrder: false,
+        statusReturOrder: false,
+        keterangan_retur: ""
       }
     },
 
@@ -418,9 +506,11 @@
         this.setorUang = [];
         this.kembaliPack = [];
         this.kembaliOrders = [];
+        this.returOrder = [];
         this.statusSetorUang = false;
         this.statusKembaliPack = false;
         this.statusKembaliOrder = false;
+        this.statusReturOrder = false;
         this.detail_orders = item.detail_orders;
       },
 
@@ -448,12 +538,42 @@
             this.kembaliOrders.push({
               id_barang: item.id_barang,
               nama_barang: item.barang.nama_barang,
+              satuan: item.barang.satuan === '1' ? 'Kg' : 'butir',
               jumlah : item.jumlah_barang,
-              jumlah_barang : 0
+              jumlah_barang : 0,
+              id_pack: item.id_pack,
+              nama_pack: item.pack.nama_pack,
+              jumlahPack: item.jumlah_pack,
+              jumlah_pack: 0,
             })
           });
         } else {
           this.kembaliOrders = [];
+        }
+      },
+
+      toggleRetur : function(){
+        this.statusReturOrder = !this.statusReturOrder
+        this.keterangan_retur= ""
+        if (this.statusReturOrder) {
+          this.detail_orders.forEach((item, i) => {
+            this.returOrder.push({
+              id_barang: item.id_barang,
+              nama_barang: item.barang.nama_barang,
+              satuan: item.barang.satuan === '1' ? 'Kg' : 'butir',
+              jumlah : item.jumlah_barang,
+              jumlah_barang : 0,
+              harga_beli: item.harga_beli,
+              id_pack: item.id_pack,
+              nama_pack: item.pack.nama_pack,
+              jumlahPack: item.jumlah_pack,
+              jumlah_pack: 0,
+              harga_pack: item.harga_pack,
+              is_lock: item.is_lock
+            })
+          });
+        } else {
+          this.returOrder = [];
         }
       },
 
@@ -475,11 +595,14 @@
           let id_orders = this.selectedOrder.id_orders;
           let form = new FormData();
           let detail_kembali_orders = this.kembaliOrders.filter(it => it.jumlah_barang > 0);
+          let detail_retur_order = this.returOrder.filter(it => it.jumlah_barang > 0);
           form.append("id_users", this.users.id_users);
           form.append("id_pembeli", this.selectedOrder.id_pembeli);
           form.append("setor_uang", JSON.stringify(this.setorUang));
           form.append("kembali_pack", JSON.stringify(this.kembaliPack));
           form.append("detail_kembali_orders", JSON.stringify(detail_kembali_orders));
+          form.append("detail_retur_order", JSON.stringify(detail_retur_order));
+          form.append("keterangan_retur", this.keterangan_retur);
           axios.post(base_url + "/delivered-orders/" + id_orders, form, conf)
           .then(response => {
             this.$bvToast.hide("loading");

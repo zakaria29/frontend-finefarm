@@ -39,7 +39,9 @@
             <b-button variant="info" class="text-left" block style="border-radius:6px"
             v-b-toggle="'acc-' + p.id_pack">
               {{ p.nama_pack }}
-              <b-badge pill variant="warning">{{ p.total }}</b-badge>
+              <b-badge pill class="bg-primary text-white mx-2">
+                <h4 class="text-white mx-1">{{ p.total }}</h4>
+              </b-badge>
             </b-button>
           </div>
 
@@ -103,6 +105,7 @@
         axios.post(base_url + "/driver")
         .then(response => {
           this.driver = response.data.driver;
+          this.get_pack();
         })
         .catch(error => {
           alert(error);
@@ -176,7 +179,7 @@
 
     mounted(){
       this.get_driver();
-      this.get_pack();
+
     }
   }
 </script>

@@ -29,6 +29,15 @@
         Tidak Ada Tanggungan Pack
       </b-alert>
       <div class="mt-2" v-if="tanggungan.length > 0">
+        <strong>Summary Tanggungan Pack:</strong> <br />
+        <ul>
+          <li v-for="it in packs">
+            <b-row>
+              <b-col cols="4">{{ it.nama_pack }}</b-col>
+              <b-col>: {{ it.tanggungan_pack[0].jumlah }} item</b-col>
+            </b-row>
+          </li>
+        </ul>
         <ul class="list-group">
           <li class="list-group-item" v-for="item in tanggungan">
             <h3>{{ item.nama }}</h3>
@@ -100,6 +109,7 @@
       return {
         users: null,
         pack: [],
+        packs: [],
         tanggungan: [],
         message : "",
         search: "",
@@ -162,8 +172,10 @@
         axios.post(base_url + "/customer-pack", form, conf)
         .then(response => {
           this.$bvToast.hide("loading");
-          let data = response.data.filter(it => it.tanggungan_pack.length > 0);
+          let data = response.data.customer.filter(it => it.tanggungan_pack.length > 0);
+          let pack = response.data.pack.filter(it => it.tanggungan_pack.length > 0);
           this.tanggungan = data;
+          this.packs = pack;
         })
         .catch(error => {
           console.log(error);

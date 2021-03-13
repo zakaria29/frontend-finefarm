@@ -43,14 +43,14 @@
               <h4>Sopir: {{ item.sopir === null ? "-" : item.sopir.nama }}</h4>
             </b-col>
             <b-col>
-              <b-button class="btn btn-block btn-sm btn-dark" v-b-modal.modal_accept
+              <!-- <b-button class="btn btn-block btn-sm btn-dark" v-b-modal.modal_accept
               @click="accept(item)">
                 <span class="fa fa-check"></span> Verify Order
-              </b-button>
+              </b-button> -->
 
               <b-button class="btn btn-block btn-sm btn-info" v-if="(item.id_status_orders < 2)"
               @click="Edit(item.id_orders)">
-                <span class="fa fa-edit"></span> Edit Order
+                <span class="fa fa-check"></span> Verify Order
               </b-button>
 
               <b-button class="btn btn-block btn-sm btn-success" v-b-modal.modal_detail

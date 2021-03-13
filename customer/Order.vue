@@ -82,7 +82,7 @@
           <ul class="list-group col-12">
             <li v-for="(d,index) in detail_order" class="list-group-item mb-2">
               <div class="row mb-2">
-                <div class="col-3">
+                <div class="col-4">
                   Pilih Barang
                   <b-form-select v-model="d.id_barang" required
                   @change="SelectBarang(d.id_barang,index)">
@@ -92,26 +92,26 @@
                   </b-form-select>
                 </div>
 
-                <div class="col-2">
+                <div class="col-3">
                   Qty ({{ d.satuan }})
                    <b-form-input v-model="d.jumlah_barang" type="number"
                    v-on:keyup="SelectPack(index)">
                  </b-form-input>
                 </div>
 
-                <div class="col-3">
+                <!-- <div class="col-3">
                   Harga <br />
                   {{ "Rp " + formatNumber(d.harga_beli) }}
-                </div>
+                </div> -->
 
-                <div class="col-4">
+                <!-- <div class="col-4">
                   Total <br />
                   {{ "Rp " +
                   formatNumber(Number(d.jumlah_barang * d.harga_beli) +
                   Number(d.jumlah_pack * d.harga_pack)) }}
-                </div>
+                </div> -->
               </div>
-              <div class="row mb-2">
+              <!-- <div class="row mb-2">
                 <div class="col-3">
                   Pilih Pack
                   <b-form-select v-model="d.id_pack" required
@@ -133,14 +133,14 @@
                    <!-- <b-form-checkbox v-model="d.harga_pack" switch @click="BeliPack(index)"
                    :value="d.beli_pack" unchecked-value="">
                     {{ (d.harga_pack) ? "Beli Pack" : "Pinjam Pack" }}
-                  </b-form-checkbox> -->
+                  </b-form-checkbox>
                   <b-form-select v-model="d.harga_pack">
                     <option v-for="it in d.buy_pack" :value="it.harga_pack">
                       {{ it.label }}
                     </option>
                   </b-form-select>
                 </div>
-              </div>
+              </div> -->
               <div class="row mb-2">
                 <b-button class="btn btn-sm btn-danger btn-block" @click="Drop(index)">
                   <span class="fa fa-trash"></span> Hapus
@@ -150,7 +150,7 @@
           </ul>
         </div>
 
-        <div class="row mb-2">
+        <!-- <div class="row mb-2">
           <div class="col-8">
 
           </div>
@@ -158,8 +158,8 @@
             <h2>Total: Rp {{ formatNumber(CountTotal()) }}</h2>
             <br />
           </div>
+        </div> -->
 
-        </div>
         <div class="row mb-2">
           <b-button variant="info" @click="Add">
             <span class="fa fa-plus"></span> Tambah List
@@ -397,7 +397,7 @@
             form.append("catatan", this.orders.catatan);
             form.append("detail_orders", JSON.stringify(this.detail_order));
 
-            axios.post(base_url + "/orders/new_order", form, conf)
+            axios.post(base_url + "/customer-order", form, conf)
             .then(response => {
               this.$bvToast.hide("loading");
               this.message = response.data.message;

@@ -42,10 +42,10 @@
                 <span class="fa fa-truck"></span> Kirim Order
               </b-button>
 
-              <b-button class="btn btn-block btn-sm btn-success" v-b-modal.modal_detail
+              <!-- <b-button class="btn btn-block btn-sm btn-success" v-b-modal.modal_detail
               @click="Detail(item)">
                 <span class="fa fa-eye"></span> Detail Order
-              </b-button>
+              </b-button> -->
 
               <b-button class="btn btn-block btn-sm btn-warning" v-b-modal.modal_log
               @click="LogOrder(item)">
@@ -61,7 +61,7 @@
           <b-row>
             <b-col>
               Status Order:
-              <b-badge pill class="text-white" :variant="type[item.id_status_orders]">
+              <b-badge pill class="text-dark" :variant="type[item.id_status_orders]">
                 {{ item.status_orders.nama_status_order }}
               </b-badge>
             </b-col>
@@ -72,6 +72,37 @@
               <b-badge class="bg-orange text-white">
                 {{ item.kendala }}
               </b-badge>
+            </b-col>
+          </b-row>
+
+          <b-row class="my-2">
+            <b-col>
+              <ul class="list-group">
+                <li class="list-group-item" v-for="it in item.detail_orders">
+                  <b-row>
+                    <b-col cols="3">
+                      <small class="text-info">Nama Barang</small>
+                      <h4>{{ it.barang.nama_barang }}</h4>
+                    </b-col>
+                    <b-col cols="3">
+                      <small class="text-info">Qty</small>
+                      <h4>
+                        {{ it.jumlah_barang }} {{ it.barang.satuan === '1' ? 'Kg' : 'Butir' }} <br />
+                        <i class="text-primary">[{{ it.pack.nama_pack }} : {{ it.jumlah_pack }} item]</i>
+                      </h4>
+                    </b-col>
+                    <b-col cols="3">
+                      <small class="text-info">Harga</small>
+                      <h4>{{ "Rp " + formatNumber(it.harga_beli) }}</h4>
+                    </b-col>
+                    <b-col cols="3">
+                      <small class="text-info">Total</small>
+                      <h4>{{ "Rp " + formatNumber(it.harga_beli * it.jumlah_barang) }}</h4>
+                    </b-col>
+
+                  </b-row>
+                </li>
+              </ul>
             </b-col>
           </b-row>
         </li>

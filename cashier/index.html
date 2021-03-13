@@ -122,6 +122,9 @@
                         <router-link class="dropdown-item" to="/verify-kembali-orders">
                           <i class="fa fa-coins"></i> Verifikasi Pengurangan Order
                         </router-link>
+                        <router-link class="dropdown-item" to="/verify-retur-order">
+                          <i class="fa fa-coins"></i> Verifikasi Retur Order
+                        </router-link>
                       </div>
                   </li>
 
@@ -178,6 +181,12 @@
                         </router-link>
                         <router-link class="dropdown-item" to="/list_order">
                           <i class="fa fa-list"></i> List Order
+                        </router-link>
+                        <router-link class="dropdown-item" to="/kembali_order">
+                          <i class="fa fa-list"></i> Histori Pengurangan Order
+                        </router-link>
+                        <router-link class="dropdown-item" to="/retur_order">
+                          <i class="fa fa-list"></i> Histori Retur Order
                         </router-link>
                       </div>
                   </li>
@@ -278,6 +287,7 @@
       { path: "/tanggungan-pembayaran", name: "TanggunganPembayaran", component: httpVueLoader("TanggunganPembayaran.vue")},
       { path: "/verify-pembayaran", name: "VerifyPembayaran", component: httpVueLoader("VerifyPembayaran.vue")},
       { path: "/verify-kembali-orders", name: "VerifikasiKembaliOrders", component: httpVueLoader("VerifikasiKembaliOrders.vue")},
+      { path: "/verify-retur-order", name: "VerifikasiReturOrder", component: httpVueLoader("VerifikasiReturOrder.vue")},
       { path: "/customer", name: "Customer", component: httpVueLoader("Customer.vue")},
       { path: "/sopir", name: "Sopir", component: httpVueLoader("Sopir.vue")},
       { path: "/supplier", name: "Supplier", component: httpVueLoader("Supplier.vue")},
@@ -290,6 +300,8 @@
       { path: "/order", name: "Order", component: httpVueLoader("Order.vue")},
       { path: "/send", name: "SendOrder", component: httpVueLoader("SendOrder.vue")},
       { path: "/accept", name: "AcceptOrder", component: httpVueLoader("VerifyOrder.vue")},
+      { path: "/kembali_order", name: "ListKembaliOrder", component: httpVueLoader("ListKembaliOrder.vue")},
+      { path: "/retur_order", name: "ListReturOrder", component: httpVueLoader("ListReturOrder.vue")},
       { path: "/edit_order/:id_orders" , name: "EditOrder",
       component: httpVueLoader("EditOrder.vue")},
       { path: "/list_order", name: "ListOrder", component: httpVueLoader("ListOrder.vue")},

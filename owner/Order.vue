@@ -177,7 +177,7 @@
                    :value="d.beli_pack" unchecked-value="">
                     {{ (d.harga_pack === '0') ? "Beli Pack" : "Pinjam Pack" }}
                   </b-form-checkbox> -->
-                  <b-form-select v-model="d.harga_pack">
+                  <b-form-select v-model="d.harga_pack" @change="CountTotal()">
                     <option v-for="it in d.buy_pack" :value="it.harga_pack">
                       {{ it.label }}
                     </option>
@@ -195,11 +195,14 @@
 
         <div class="row mb-2">
           <div class="col-8">
-
+            <h2>Total</h2>
           </div>
           <div class="col-4">
-            <h2>Total: Rp {{ formatNumber(CountTotal()) }}</h2>
-            <br />
+            <!-- <h2>Rp {{ formatNumber(CountTotal()) }}</h2>
+            <br /> -->
+            <input type="number" class="form-control"
+            v-model="orders.total_bayar" />
+            <!-- {{ orders.total_bayar }} -->
           </div>
 
         </div>
@@ -270,7 +273,7 @@
         dp: false,
         jatuh_tempo: 0,
         users_lock: false,
-
+        total_bayar: 0,
       }
     },
 
@@ -308,6 +311,8 @@
           }
         }
         this.detail_order[index].id_pack = item.pack[0].id_pack;
+
+        this.CountTotal();
       },
 
       SelectPack : function(index){
@@ -337,7 +342,7 @@
         }
 
         this.BeliPack(index);
-
+        this.CountTotal();
       },
 
       BeliPack : function(index){
@@ -420,7 +425,7 @@
           (Number(item.harga_pack) * Number(item.jumlah_pack));
         });
         this.orders.total_bayar = total;
-        return total;
+        // return total;
       },
 
       Tipe : function(){

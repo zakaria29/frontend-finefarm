@@ -8,23 +8,29 @@
     <div class="card-body">
       <form v-on:submit.prevent="getMutasi">
         <b-row>
-          <b-col cols="4">
-            Pilih Pack
-            <b-form-select v-model="id_pack" class="mb-2" required>
-              <option v-for="p in pack" :value="p.id_pack">{{ p.nama_pack }}</option>
-            </b-form-select>
-            <!-- Pilih Customer
-            <v-select :options="customer"
-            :reduce="nama => nama.id_users" label="nama" v-model="id_pembeli">
-            <template #search="{attributes, events}">
-              <input
-                class="vs__search"
-                :required="!id_pembeli"
-                v-bind="attributes"
-                v-on="events"
-              />
-            </template>
-            </v-select> -->
+          <b-col cols="6">
+            <b-row>
+              <b-col>
+                Pilih Pack
+                <b-form-select v-model="id_pack" class="mb-2" required>
+                  <option v-for="p in pack" :value="p.id_pack">{{ p.nama_pack }}</option>
+                </b-form-select>
+              </b-col>
+              <b-col>
+                Pilih Customer
+                <v-select :options="customer"
+                :reduce="nama => nama.id_users" label="nama" v-model="id_pembeli">
+                <template #search="{attributes, events}">
+                  <input
+                    class="vs__search"
+                    :required="!id_pembeli"
+                    v-bind="attributes"
+                    v-on="events"
+                  />
+                </template>
+                </v-select>
+              </b-col>
+            </b-row>
           </b-col>
 
           <b-col>
@@ -85,6 +91,11 @@
               {{ Number(data.item.stok)-Number(data.item.keluar)+Number(data.item.masuk) }}
             </strong>
           </template>
+          <template v-slot:cell(sisa)="data">
+            <strong class="text-info">
+              {{ data.item.stokPack }}
+            </strong>
+          </template>
         </b-table>
       </div>
   </div>
@@ -106,6 +117,7 @@
         from: "",
         to: "",
         key: "",
+        stokPack: 0,
       }
     },
 
@@ -116,14 +128,27 @@
         let form = new FormData();
         form.append("from", this.from);
         form.append("to", this.to);
+        this.fields = ["waktu","masuk","keluar","beli","total_beli","stok_akhir"]
         if (this.id_pembeli !== "0") {
           form.append("id_pembeli", this.id_pembeli);
+          this.fields = ["waktu","masuk","keluar","beli","total_beli","sisa"]
         }
 
         axios.post(base_url + "/mutasi-pack/" + this.id_pack, form, conf)
         .then(response => {
           this.$bvToast.hide("loading");
-          this.mutasi = response.data.log_pack;
+          this.mutasi = response.data.mutasi.log_pack;
+          let stokPack = response.data.stok;
+
+          if (this.id_pembeli !== "0") {
+            for (var i = 0; i < response.data.mutasi.log_pack.length; i++) {
+              stokPack = Number(stokPack) + Number(response.data.mutasi.log_pack[i].keluar) -
+              Number(response.data.mutasi.log_pack[i].masuk) -
+              Number(response.data.mutasi.log_pack[i].beli);
+              response.data.mutasi.log_pack[i].stokPack = stokPack
+            }
+
+          }
         })
         .catch(error => {
           console.log(error);
@@ -170,6 +195,7 @@
 
       init : async function(){
         await this.get_pack();
+        await this.get_customer();
       },
     },
 
