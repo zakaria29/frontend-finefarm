@@ -115,9 +115,16 @@
               <h4>Sopir: {{ item.sopir === null ? "-" : item.sopir.nama }}</h4>
             </b-col>
             <b-col>
-              <b-button size="sm" class="btn btn-block btn-sm btn-info" v-if="(item.id_status_orders < 3)"
+              <b-button size="sm" class="btn btn-block btn-sm btn-info"
+              v-if="(item.id_status_orders < 3 && item.id_status_orders > 0)"
               @click="Edit(item.id_orders)">
                 <span class="fa fa-edit"></span> Edit Order
+              </b-button>
+
+              <b-button size="sm" class="btn btn-block btn-sm btn-danger"
+              v-if="(item.id_status_orders < 3 && item.id_status_orders > 0)"
+              @click="Cancel(item.id_orders)">
+                <span class="fa fa-times"></span> Cancel Order
               </b-button>
 
               <!-- <b-button size="sm" class="btn btn-block btn-sm btn-success" v-b-modal.modal_detail
@@ -201,6 +208,18 @@
       v-on:input="find">
       </b-pagination>
     </div>
+
+    <!-- toast -->
+    <!-- toast untuk tampilan message box -->
+    <b-toast id="message" title="Message" solid>
+      <strong class="text-success">{{ message }}</strong>
+    </b-toast>
+
+    <b-toast id="loading" title="Processing Data" solid no-auto-hide>
+      <!-- <b-spinner label="Spinning" variant="success"></b-spinner> -->
+      <span class="fa fa-spinner fa-spin"></span>
+      <strong class="text-success">Loading...</strong>
+    </b-toast>
 
     <b-modal id="modal_kuitansi" title="Buat Kuitansi"
       header-bg-variant="info" size="md"
@@ -327,6 +346,7 @@
     data : function(){
       return {
         message : "",
+        users: null,
         key: "",
         orders: [],
         customer: [],
@@ -454,9 +474,45 @@
         .catch(error => {
           console.log(error);
         })
+      },
 
+      Cancel : function(id_orders){
+        if (window.confirm("Apakah Anda yakin ingin menbatalkan order ini?")) {
+          this.$bvToast.show("loading");
+          let conf = { headers: { "Api-Token" : this.key} };
+          let form = new FormData();
+          form.append("id_users", this.users.id_users);
+          axios.post(base_url+"/cancel-order/" + id_orders, form, conf)
+          .then(response => {
+            this.$bvToast.hide("loading");
+            this.message = response.data.message;
+            this.$bvToast.show("message");
+            this.find();
+          })
+          .catch(error => {
+            console.log(error);
+          });
+        }
+      },
 
-      }
+      initUser: function(){
+        let token = this.$cookies.get("Api-Token");
+        let form = new FormData();
+        form.append("token",token);
+        axios.post(base_url+"/owner/check", form)
+        .then(response => {
+          if (response.data.auth == false) {
+            window.location = "login.html";
+          } else{
+            this.users = response.data.owner;
+            this.orders.id_users = response.data.owner.id_users;
+            this.get_customer();
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      },
     },
 
     mounted(){
@@ -465,7 +521,7 @@
       this.to = currentDate;
       let lastMonth = new Date(date.getFullYear(), date.getMonth()-1, date.getDate());
       this.from = lastMonth.toISOString().slice(0,10);
-      this.get_customer();
+      this.initUser();
     }
   }
 </script>

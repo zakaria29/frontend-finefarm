@@ -2,12 +2,11 @@
   <div class="card">
     <div class="card-header">
       <h3>
-        <span class="acquisitions-incorporated"></span> Order
+        <span class="acquisitions-incorporated"></span> Verifikasi Order
       </h3>
     </div>
 
     <div class="card-body">
-
       <form v-on:submit.prevent="Save">
         <div class="row mb-2">
           <div class="col-3">
@@ -28,7 +27,7 @@
           </div>
         </div>
 
-        <div class="row mb-2" v-if="false">
+        <div class="row mb-2">
           <div class="col-sm-3">
             Waktu Order
           </div>
@@ -45,8 +44,8 @@
             Waktu Pengiriman
           </div>
           <div class="col-3">
-            <input type="date" v-model="orders.waktu_pengiriman"
-            class="form-control" required @change="setJatuhTempo()" />
+            <input type="date" v-model="orders.waktu_pengiriman" @change="setJatuhTempo()"
+            class="form-control" required />
           </div>
           <div class="col-2">
             Jatuh Tempo
@@ -70,7 +69,7 @@
           </div>
           <div class="col-4">
             <input type="text" v-model="orders.invoice"
-            class="form-control" required readonly />
+            class="form-control" required />
           </div>
         </div>
 
@@ -130,7 +129,7 @@
                 </div>
 
                 <div class="col-2">
-                  Qty ({{ d.satuan }})
+                  Qty
                    <b-form-input v-model="d.jumlah_barang" type="number"
                    v-on:keyup="SelectPack(index)" @change="CountTotal()">
                  </b-form-input>
@@ -144,6 +143,10 @@
                   v-if="users_lock"
                  @click="() => {d.is_lock = !d.is_lock; SelectBarang(d.id_barang, index)}">
                    {{ d.is_lock ? "Pakai Harga Saat ini" : "Pakai Harga Lock" }}
+                 </b-button>
+                 <b-button block size="sm" variant="dark" v-else
+                 @click="SelectBarang(d.id_barang, index)">
+                   Set Harga Saat ini
                  </b-button>
                 </div>
 
@@ -166,22 +169,17 @@
                 </div>
                 <div class="col-2">
                   Jumlah Pack
-                  <b-form-input v-model="d.jumlah_pack" type="number" required>
+                  <b-form-input v-model="d.jumlah_pack" type="number" min="1" required>
                   </b-form-input>
                 </div>
 
                 <div class="col-2">
                   Keterangan Pack
                   <br />
-                   <!-- <b-form-checkbox v-model="d.harga_pack" switch @click="BeliPack(index)"
+                   <b-form-checkbox v-model="d.harga_pack" switch @click="BeliPack(index)"
                    :value="d.beli_pack" unchecked-value="">
-                    {{ (d.harga_pack === '0') ? "Beli Pack" : "Pinjam Pack" }}
-                  </b-form-checkbox> -->
-                  <b-form-select v-model="d.harga_pack" @change="CountTotal()">
-                    <option v-for="it in d.buy_pack" :value="it.harga_pack">
-                      {{ it.label }}
-                    </option>
-                  </b-form-select>
+                    {{ (d.harga_pack > 0) ? "Beli Pack" : "Pinjam Pack" }}
+                  </b-form-checkbox>
                 </div>
               </div>
               <div class="row mb-2">
@@ -249,15 +247,17 @@
         message: "",
         margin: 0,
         margin_group: 0,
+        driver: [],
         barang: [],
         tempBarang: [],
-        driver: [],
         customer: [],
         detail_order: [],
         orders: {
           id_orders: "",
           id_users: "",
           id_pembeli: "",
+          id_sopir: "",
+          id_status_orders: "",
           date_order: "",
           time_order: "",
           waktu_pengiriman: "",
@@ -268,12 +268,9 @@
           po: "",
           invoice: "",
           catatan: "",
-          id_sopir: ""
         },
         dp: false,
-        jatuh_tempo: 0,
-        users_lock: false,
-        total_bayar: 0,
+        users_lock : false,
       }
     },
 
@@ -292,9 +289,7 @@
           harga_pack: "",
           jumlah_pack: 0,
           beli_pack : 0,
-          satuan: "",
           is_lock: this.users_lock,
-          buy_pack: [],
         });
       },
 
@@ -311,85 +306,41 @@
           }
         }
         this.detail_order[index].id_pack = item.pack[0].id_pack;
-
         this.CountTotal();
       },
 
       SelectPack : function(index){
         let id = this.detail_order[index].id_pack;
         let item = this.detail_order[index].pack.find(it => it.id_pack === id);
-        this.detail_order[index].beli_pack = item.harga;
         let barang = this.barang.find(it => it.id_barang === this.detail_order[index].id_barang);
         if (barang.satuan === "1") {
-          let packBarang = barang.pack.find(it => it.id_pack === id);
-          if (packBarang.capacity_kg.length === 0) {
-            this.detail_order[index].jumlah_pack =
-            Math.ceil(Number(this.detail_order[index].jumlah_barang) * Number(item.kapasitas_kg));
-          }else{
-            let jumlah_barang = Number(this.detail_order[index].jumlah_barang);
-            let kapasitas = Number(item.kapasitas_kg);
-            let jumlah_pack = Math.floor(jumlah_barang / 10) * 10 * kapasitas;
-            let sisa = jumlah_barang % 10;
-            if(sisa > 0){
-              let s = packBarang.capacity_kg.find(it => it.kapasitas === sisa.toString());
-              jumlah_pack = Number(jumlah_pack) + Number(s.jumlah);
-            }
-            this.detail_order[index].jumlah_pack = jumlah_pack;
-          }
+          this.detail_order[index].jumlah_pack =
+          Math.ceil(Number(this.detail_order[index].jumlah_barang) * Number(item.kapasitas_kg));
         }else if (barang.satuan === "2") {
           this.detail_order[index].jumlah_pack =
           Math.ceil(Number(this.detail_order[index].jumlah_barang) * Number(item.kapasitas_butir));
         }
-
+        this.detail_order[index].beli_pack = item.harga;
         this.BeliPack(index);
         this.CountTotal();
       },
 
       BeliPack : function(index){
-        this.detail_order[index].buy_pack = [];
-        if (this.detail_order[index].beli_pack > 0) {
+        if (this.detail_order[index].harga_pack > 0) {
           let id_pack = this.detail_order[index].id_pack;
           let pack = this.detail_order[index].pack.find(it => it.id_pack === id_pack);
           this.detail_order[index].harga_pack = pack.harga;
-          this.detail_order[index].buy_pack.push(
-            { harga_pack: 0, label: "Pinjam Pack" },
-            { harga_pack: pack.harga, label: "Beli Pack" },
-          );
-          this.detail_order[index].harga_pack = 0;
         }else{
           this.detail_order[index].harga_pack = 0;
-          this.detail_order[index].buy_pack.push(
-            { harga_pack: 0, label: "Beli Pack" }
-          );
-          this.detail_order[index].harga_pack = 0;
         }
-
+        this.CountTotal();
       },
 
       Customer : function(){
         let item = this.customer.find(it => it.id_users === this.orders.id_pembeli);
         this.margin = item.margin;
         this.margin_group = item.margin_group;
-        this.jatuh_tempo = item.jatuh_tempo;
-        this.detail_order = [];
-        if (this.orders.waktu_pengiriman !== "") {
-          let send = new Date(this.orders.waktu_pengiriman)
-          send.setDate(Number(send.getDate()) + Number(this.jatuh_tempo))
-          this.orders.tgl_jatuh_tempo = send.toISOString().slice(0,10);;
-          // console.log(this.orders.tgl_jatuh_tempo);
-        }
-        let nama = item.nama;
-        var initials = item.inisial;
-        let count = Number(item.orders.length) + 1;
-        let urutan = null;
-        if (count.toString().length == 1) {
-          urutan = "00" + count;
-        }else if(count.toString().length == 2){
-          urutan = "0" + count;
-        }
-        let d = new Date();
-        this.orders.invoice = initials + d.getFullYear().toString() + (d.getMonth()+1).toString() +
-        d.getDate().toString() +  "-" + urutan;
+        // this.detail_order = [];
 
         if(item.lock_pack_barang.length > 0){
           this.barang = [];
@@ -397,9 +348,6 @@
           item.lock_pack_barang.forEach((it, i) => {
             brg = this.tempBarang.find(itm => itm.id_barang === it.id_barang);
             brg.harga_lock = it.harga;
-            let tempPack = brg.pack;
-            brg.pack = [];
-            brg.pack.push(tempPack.find(itm => itm.id_pack === it.id_pack));
             this.barang.push(brg);
           });
           this.users_lock = true;
@@ -407,15 +355,6 @@
           this.barang = this.tempBarang;
           this.users_lock = false;
         }
-
-      },
-
-      setJatuhTempo : function(){
-        let send = new Date(this.orders.waktu_pengiriman)
-        // console.log(this.jatuh_tempo);
-        send.setDate(Number(send.getDate()) + Number(this.jatuh_tempo))
-        this.orders.tgl_jatuh_tempo = send.toISOString().slice(0,10);;
-        // console.log(this.orders.tgl_jatuh_tempo);
       },
 
       CountTotal : function(){
@@ -461,17 +400,6 @@
         })
       },
 
-      get_driver : function(){
-        let conf = { headers: { "Api-Token" : this.key} };
-        axios.get(base_url + "/driver", conf)
-        .then(response => {
-          this.driver = response.data.driver;
-        })
-        .catch(error => {
-          alert(error);
-        })
-      },
-
       Save : function(){
         if (this.detail_order.length > 0) {
           if (confirm("Apakah Anda yakin dengan order ini?")) {
@@ -479,7 +407,7 @@
             this.$bvToast.show("loading");
             let form = new FormData();
             form.append("id_orders", this.orders.id_orders);
-            form.append("id_users", this.orders.id_users);
+            form.append("id_users", this.orders.id_users); // sementara
             form.append("id_pembeli", this.orders.id_pembeli);
             form.append("id_sopir", this.orders.id_sopir);
             form.append("waktu_order",this.orders.date_order + " " + this.orders.time_order);
@@ -491,14 +419,16 @@
             form.append("po", this.orders.po);
             form.append("invoice", this.orders.invoice);
             form.append("catatan", this.orders.catatan);
+            form.append("verify", this.orders.id_status_orders === '1' ? true : false);
             form.append("detail_orders", JSON.stringify(this.detail_order));
 
-            axios.post(base_url + "/orders/new_order", form, conf)
+            axios.post(base_url + "/orders/update_order", form, conf)
             .then(response => {
               this.$bvToast.hide("loading");
               this.message = response.data.message;
               this.$bvToast.show("message");
-              this.refresh();
+              // this.get_order();
+              this.$router.push({ name: "AcceptOrder"});
             })
             .catch(error => {
               alert(error);
@@ -507,6 +437,66 @@
         }else{
           alert("Anda belum memilih list barang");
         }
+      },
+
+      get_driver : function(){
+        let conf = { headers: { "Api-Token" : this.key} };
+        axios.get(base_url + "/driver", conf)
+        .then(response => {
+          this.driver = response.data.driver;
+          this.Customer();
+        })
+        .catch(error => {
+          alert(error);
+        })
+      },
+
+      setJatuhTempo : function(){
+        let send = new Date(this.orders.waktu_pengiriman)
+        // console.log(this.jatuh_tempo);
+        send.setDate(Number(send.getDate()) + Number(this.jatuh_tempo))
+        this.orders.tgl_jatuh_tempo = send.toISOString().slice(0,10);;
+        // console.log(this.orders.tgl_jatuh_tempo);
+      },
+
+      get_order : function(){
+        let conf = { headers: { "Api-Token" : this.key} };
+        axios.get(base_url + "/orders/get/" + this.orders.id_orders)
+        .then(response => {
+          console.log(response.data);
+          this.margin =  response.data.orders.margin;
+          this.margin_group = response.data.orders.margin_group;
+          this.detail_order = response.data.orders.detail_orders;
+          // this.orders.id_users =  response.data.orders.id_users === null ?
+          // null : this.users.id_users;
+          this.orders.id_pembeli =  response.data.orders.id_pembeli;
+          this.orders.id_sopir =  response.data.orders.id_sopir;
+          this.orders.id_status_orders = response.data.orders.id_status_orders;
+
+          this.orders.waktu_pengiriman =  response.data.orders.waktu_pengiriman;
+          this.orders.tgl_jatuh_tempo =  response.data.orders.tgl_jatuh_tempo;
+          this.orders.tipe_pembayaran =
+          response.data.orders.down_payment > 0 ? "2" : response.data.orders.tipe_pembayaran;
+          this.orders.total_bayar =  response.data.orders.total_bayar;
+          this.orders.down_payment =  response.data.orders.down_payment;
+          this.orders.po =  response.data.orders.po;
+          this.orders.invoice =  response.data.orders.invoice;
+          this.orders.catatan =  response.data.orders.catatan;
+          this.dp= response.data.orders.down_payment > 0 ? true : false;
+
+          let date = new Date(response.data.orders.waktu_order);
+          let currentDate = date.toISOString().slice(0,10);
+          let currentTime = date.getHours() + ':' + date.getMinutes();
+          this.orders.date_order = currentDate;
+          // this.supply.time = currentTime;
+          this.orders.time_order = (date.getHours() < 10 ? "0"+date.getHours() : date.getHours())
+          + ":" + (date.getMinutes() < 10 ? "0"+date.getMinutes() : date.getMinutes());
+
+          this.get_barang();
+        })
+        .catch(error => {
+          alert(error);
+        });
       },
 
       initUser: function(){
@@ -518,56 +508,22 @@
           if (response.data.auth == false) {
             window.location = "login.html";
           } else{
+            this.key = token;
             this.users = response.data.cashier;
             this.orders.id_users = response.data.cashier.id_users;
-            this.get_barang();
+            this.get_order();
           }
         })
         .catch(error => {
           console.log(error);
         });
       },
-
-      refresh : function(){
-        this.margin =  0
-        this.margin_group = 0;
-        this.detail_order = [];
-        this.orders.id_orders =  "";
-        // this.orders.id_users =  "";
-        this.orders.id_pembeli =  "";
-
-        this.orders.waktu_pengiriman =  "";
-        this.orders.tgl_jatuh_tempo =  "";
-        this.orders.tipe_pembayaran =  "";
-        this.orders.total_bayar =  0;
-        this.orders.down_payment =  0;
-        this.orders.po =  "";
-        this.orders.invoice =  "";
-        this.orders.catatan =  "";
-        this.dp= false;
-
-        let date = new Date();
-        let currentDate = date.toISOString().slice(0,10);
-        let currentTime = date.getHours() + ':' + date.getMinutes();
-        this.orders.date_order = currentDate;
-        // this.supply.time = currentTime;
-        this.orders.time_order = (date.getHours() < 10 ? "0"+date.getHours() : date.getHours())
-        + ":" + (date.getMinutes() < 10 ? "0"+date.getMinutes() : date.getMinutes());
-      },
     },
 
 
     mounted(){
+      this.orders.id_orders = this.$route.params.id_orders;
       this.initUser();
-      let date = new Date();
-      let currentDate = date.toISOString().slice(0,10);
-      let currentTime = date.getHours() + ':' + date.getMinutes();
-      this.orders.date_order = currentDate;
-      // this.supply.time = currentTime;
-      this.orders.time_order = (date.getHours() < 10 ? "0"+date.getHours() : date.getHours())
-      + ":" + (date.getMinutes() < 10 ? "0"+date.getMinutes() : date.getMinutes());
-
-
     }
   }
 </script>

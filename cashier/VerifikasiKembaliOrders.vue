@@ -30,7 +30,7 @@
                 <h4>ID Order: {{ item.orders.id_orders }}</h4>
                 <h4>Waktu Kirim: {{ formatDate(item.orders.waktu_pengiriman) }}</h4>
                 <h4>Customer: {{ item.orders.pembeli.nama }}</h4>
-                <h3 class="text-info">Total: Rp {{ formatNumber(item.orders.total_bayar) }}</h3>
+                <h4>Sopir: {{ item.orders.sopir.nama }}</h4>
               </b-col>
               <b-col>
                 <b-button class="btn btn-info" size="md" block v-b-modal.modal_verify

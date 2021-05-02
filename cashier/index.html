@@ -304,6 +304,8 @@
       { path: "/retur_order", name: "ListReturOrder", component: httpVueLoader("ListReturOrder.vue")},
       { path: "/edit_order/:id_orders" , name: "EditOrder",
       component: httpVueLoader("EditOrder.vue")},
+      { path: "/verify_order/:id_orders" , name: "VerifyOrder",
+      component: httpVueLoader("OrderVerification.vue")},
       { path: "/list_order", name: "ListOrder", component: httpVueLoader("ListOrder.vue")},
     ];
     let routers = new VueRouter({ routes : router, base: "/owner" });

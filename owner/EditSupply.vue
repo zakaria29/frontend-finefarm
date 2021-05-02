@@ -230,7 +230,8 @@
               this.$bvToast.hide("loading");
               this.message = response.data.message;
               this.$bvToast.show("message");
-              this.get_supply();
+              // this.get_supply();
+              this.$router.push({ name: "ListSupply"});
             })
             .catch(error => {
               alert(error);

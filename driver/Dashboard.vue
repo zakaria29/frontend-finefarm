@@ -151,6 +151,52 @@
             </div>
           </div>
 
+          <div class="card card-stats">
+            <div :class="retur_order.barang.filter(it => it.detail_retur_order.length > 0) > 0 ?
+            'card-body bg-lighter' : 'card-body'">
+              <div class="row">
+                <div class="col">
+                  <h5 class="card-title text-uppercase text-muted mb-0">
+                    Barang yang di retur
+                  </h5>
+                  <h4 class="font-weight-bold mb-0">
+                    <div v-for="b in retur_order.barang">
+                      <b-row v-for="ko in b.detail_retur_order">
+                        <b-col cols="8">
+                          {{ b.nama_barang }}
+                        </b-col>
+                        <b-col>: {{ ko.jumlah }}
+                          <small>{{ (b.satuan === "1") ? " Kg" : " Butir" }}</small>
+                        </b-col>
+                      </b-row>
+                    </div>
+                  </h4>
+                  <hr />
+                  <h5 class="card-title text-uppercase text-muted mb-0">
+                    Pack yang di retur
+                  </h5>
+                  <h4 class="font-weight-bold mb-0">
+                    <div v-for="k in retur_order.pack">
+                      <b-row v-for="ko in k.detail_retur_order">
+                        <b-col cols="8">
+                          {{ k.nama_pack }}
+                        </b-col>
+                        <b-col>: {{ ko.jumlah }}
+                          <small> item</small>
+                        </b-col>
+                      </b-row>
+                    </div>
+                  </h4>
+                </div>
+                <div class="col-auto">
+                  <div class="icon icon-shape bg-dark text-white rounded-circle shadow">
+                    <i class="ni ni-box-2"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
         <div class="col-xl-4 col-md-6">
@@ -208,7 +254,7 @@
           </div>
 
           <div class="card card-stats">
-            <div :class="kembali_orders.filter(it => it.detail_kembali_orders.length > 0) > 0 ?
+            <div :class="kembali_orders.barang.filter(it => it.detail_kembali_orders.length > 0) > 0 ?
             'card-body bg-lighter' : 'card-body'">
               <div class="row">
                 <div class="col">
@@ -216,7 +262,7 @@
                     Barang yang harus dikembalikan
                   </h5>
                   <h4 class="font-weight-bold mb-0">
-                    <div v-for="b in kembali_orders">
+                    <div v-for="b in kembali_orders.barang">
                       <b-row v-for="ko in b.detail_kembali_orders">
                         <b-col cols="8">
                           {{ b.nama_barang }}
@@ -227,7 +273,22 @@
                       </b-row>
                     </div>
                   </h4>
-
+                  <hr />
+                  <h5 class="card-title text-uppercase text-muted mb-0">
+                    Pack yang harus dikembalikan
+                  </h5>
+                  <h4 class="font-weight-bold mb-0">
+                    <div v-for="k in kembali_orders.pack">
+                      <b-row v-for="ko in k.detail_kembali_orders">
+                        <b-col cols="8">
+                          {{ k.nama_pack }}
+                        </b-col>
+                        <b-col>: {{ ko.jumlah }}
+                          <small> item</small>
+                        </b-col>
+                      </b-row>
+                    </div>
+                  </h4>
                 </div>
                 <div class="col-auto">
                   <div class="icon icon-shape bg-dark text-white rounded-circle shadow">
@@ -237,6 +298,8 @@
               </div>
             </div>
           </div>
+
+
 
         </div>
 
@@ -308,6 +371,7 @@
         prepare_barang: [],
         prepare_pack: [],
         kembali_orders: [],
+        retur_order: [],
         profile: {
           nama: "",
           alamat: "",
@@ -380,6 +444,7 @@
           this.prepare_pack = response.data.prepare_pack;
           this.prepare_barang = response.data.prepare_barang;
           this.kembali_orders = response.data.kembali_orders;
+          this.retur_order = response.data.retur_order;
         })
         .catch(error => {
           console.log(error);

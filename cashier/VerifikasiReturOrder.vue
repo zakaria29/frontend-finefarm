@@ -28,6 +28,12 @@
             <h4>Waktu Kirim: {{ formatDate(item.waktu_pengiriman) }}</h4>
             <h4>Customer: {{ item.pembeli.nama }}</h4>
             <strong>Detail Retur</strong>
+
+            <b-button size="sm" class="btn m-2 btn-sm btn-warning" v-b-modal.modal_detail
+            @click="Detail(item)">
+              <span class="fa fa-history"></span> List Order Awal
+            </b-button>
+
             <form v-on:submit.prevent="VerifyRetur(index)">
               <div class="input-group mb-1">
                 <div class="input-group-prepend">
@@ -94,6 +100,73 @@
           </li>
         </ul>
       </div>
+
+      <!-- modall detail -->
+      <b-modal id="modal_detail" title="Order Awal"
+        header-bg-variant="danger" size="lg"
+        border-variant="info" hide-footer>
+
+        <b-container fluid>
+          <!-- <div class="row mb-3">
+            <div class="col-6">
+              <h4>ID Order: {{ order.id_orders }}</h4>
+              <h4>PO: {{ order.po }}</h4>
+              <h4>Invoice: {{ order.invoice }}</h4>
+              <h4>Customer: {{ order.nama_pembeli }}</h4>
+            </div>
+            <div class="col-6">
+              <h4>Tgl. Order: {{ formatDateTime(order.waktu_order) }}</h4>
+              <h4>Tgl. Pengiriman: {{ formatDate(order.waktu_pengiriman) }}</h4>
+              <h4>Tgl. Jatuh Tempo: {{ formatDate(order.tgl_jatuh_tempo) }}</h4>
+            </div>
+          </div> -->
+          <div class="row mb-3">
+            <ul class="list-group col-12">
+              <li class="list-group-item mb-2" v-for="d in detail_orders">
+                <div class="row mb-2">
+                  <div class="col-3">
+                    <strong>{{ d.barang.nama_barang }}</strong>
+                  </div>
+                  <div class="col-2">
+                    {{ d.jumlah_barang + " Kg" }}
+                  </div>
+                  <div class="col-3">
+                    {{ "@ Rp " + formatNumber(d.harga_beli) }}
+                  </div>
+                  <div class="col-4">
+                    {{ "Rp " + formatNumber(d.harga_beli * d.jumlah_barang) }}
+                  </div>
+                </div>
+                <strong>Pack</strong>
+                <div class="row mb-2">
+                  <div class="col-3">
+                    {{ d.pack.nama_pack }}
+                  </div>
+                  <div class="col-2">
+                    {{ d.jumlah_pack + " item" }}
+                  </div>
+                  <div class="col-3" v-if="(d.harga_pack > 0)">
+                    {{ "@ Rp " + formatNumber(d.harga_pack) }}
+                  </div>
+                  <div class="col-4" v-if="(d.harga_pack > 0)">
+                    {{ "Rp " + formatNumber(d.harga_pack * d.jumlah_pack) }}
+                  </div>
+                </div>
+              </li>
+              <!-- <li class="list-group-item mb-2">
+                <div class="row">
+                  <div class="col-8">
+
+                  </div>
+                  <div class="col-4">
+                    {{ "Rp " + formatNumber(order.total_bayar) }}
+                  </div>
+                </div>
+              </li> -->
+            </ul>
+          </div>
+        </b-container>
+      </b-modal>
     </div>
   </div>
 </template>
@@ -107,7 +180,8 @@
         returOrder: [],
         suppliers: [],
         packs: [],
-        selectedReturOrder: null
+        selectedReturOrder: null,
+        detail_orders: [],
       }
     },
 
@@ -153,6 +227,10 @@
         .catch(error => {
           alert(error);
         })
+      },
+
+      Detail : function(item){
+        this.detail_orders = item.detail_orders
       },
 
       VerifyRetur : function(index){

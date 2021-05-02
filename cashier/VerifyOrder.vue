@@ -345,7 +345,7 @@
         }
       },
       Edit : function(id){
-        this.$router.push({ name: "EditOrder", params: { id_orders: id }});
+        this.$router.push({ name: "VerifyOrder", params: { id_orders: id }});
 
       },
       Detail : function(item){

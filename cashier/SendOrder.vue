@@ -496,7 +496,7 @@
                 jumlah: it.jumlah,
                 satuan: it.satuan,
                 suppliers: this.supplier.filter(itm => {
-                  if(itm.stok_barang.some(sb => sb.id_barang === it.id_barang))
+                  if(itm.stok_barang.some(sb => sb.id_barang === it.id_barang && sb.stok >= it.jumlah))
                   return it
                 }),
                 supplier: [{

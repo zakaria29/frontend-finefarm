@@ -48,12 +48,14 @@
                 </div>
                 <div class="col-2">
                   Jumlah Utuh
-                   <b-form-input v-model="detail.jumlah_utuh" type="number" required>
+                   <b-form-input v-model="detail.jumlah_utuh" type="number" required
+                   @change="CountTotal()" v-on:keyup="CountTotal()">
                    </b-form-input>
                 </div>
                 <div class="col-6">
                   Harga Beli
-                   <b-form-input v-model="detail.harga_beli" type="number" required>
+                   <b-form-input v-model="detail.harga_beli" type="number" required
+                   @change="CountTotal()" v-on:keyup="CountTotal()">
                    </b-form-input>
                 </div>
 
@@ -227,6 +229,15 @@
         // this.supply.time = currentTime;
         this.supply.time = (date.getHours() < 10 ? "0"+date.getHours() : date.getHours())
         + ":" + (date.getMinutes() < 10 ? "0"+date.getMinutes() : date.getMinutes());
+      },
+
+      CountTotal : function(){
+        let total = 0;
+        this.detail_supply.map(item => {
+          total += (Number(item.harga_beli) * Number(item.jumlah_utuh));
+        });
+        this.supply.total_bayar = total;
+        // return total;
       },
     },
 

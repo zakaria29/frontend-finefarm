@@ -132,7 +132,7 @@
                 <div class="col-2">
                   Qty ({{ d.satuan }})
                    <b-form-input v-model="d.jumlah_barang" type="number"
-                   v-on:keyup="SelectPack(index)">
+                   v-on:keyup="SelectPack(index)" @change="CountTotal()">
                  </b-form-input>
                 </div>
 

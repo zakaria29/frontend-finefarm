@@ -92,7 +92,7 @@
               <div class="row">
                 <div class="col">
                   <h5 class="card-title text-uppercase text-muted mb-0">
-                    Update Harga <strong class="text-info">{{ currentUpdate }}</strong> 
+                    Update Harga <strong class="text-info">{{ currentUpdate }}</strong>
                   </h5>
                   <h4 class="font-weight-bold mb-0">
                     <div v-for="b in hargaBarang">
@@ -173,6 +173,31 @@
           <canvas ref="chLine" height="100"></canvas>
         </b-col>
       </div>
+      <hr />
+
+      <h2 class="mt-2">Reset Data</h2>
+      <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal_password">
+        <span class="fa fa-cog"></span> Reset System
+      </button>
+
+      <div class="modal fade" id="modal_password">
+        <div class="modal-dialog modal-sm">
+          <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+              <h3>Konfirmasi Reset Data</h3>
+            </div>
+            <div class="modal-body">
+              <form v-on:submit.prevent="ResetSystem()">
+                Isikan password anda untuk konfirmasi reset data ini.
+                <input type="password" class="form-control" required v-model="password" />
+                <button type="submit" class="mt-1 btn btn-sm btn-success btn-block">
+                  Confirm Reset Data
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -200,6 +225,7 @@
         stokBarang: [],
         pengguna: [],
         currentUpdate: "",
+        password: "",
       }
     },
 
@@ -301,6 +327,26 @@
         });
       },
 
+      ResetSystem : function(){
+        if (window.confirm("Apakah Anda yakin ingin mereset data sistem ini?")) {
+          let token = this.$cookies.get("Api-Token");
+          let form = new FormData();
+          form.append("token",token);
+          form.append("password", this.password);
+          axios.post(base_url+"/reset-system", form)
+          .then(response => {
+            window.alert(response.data.message);
+            if (response.data.status) {
+              $("#modal_password").modal('hide');
+              this.initUser();
+            }
+
+          })
+          .catch(error => {
+            console.log(error);
+          });
+        }
+      },
 
     },
 

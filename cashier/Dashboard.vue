@@ -110,6 +110,56 @@
             </div>
           </div>
 
+          <div class="card card-stats">
+            <div
+            :class="retur_order.barang.filter(it => it.detail_retur_order.length > 0).length > 0 ?
+            'card-body bg-lighter' : 'card-body'">
+              <router-link to="/verify-retur-order">
+                <div class="row">
+                  <div class="col">
+                    <h5 class="card-title text-uppercase text-muted mb-0">
+                      Verifikasi Retur Order (Barang)
+                    </h5>
+                    <h4 class="font-weight-bold mb-0">
+                      <div v-for="b in retur_order.barang">
+                        <b-row v-for="ko in b.detail_retur_order">
+                          <b-col cols="9">
+                            {{ b.nama_barang }}
+                          </b-col>
+                          <b-col>: {{ ko.jumlah }}
+                            <small>{{ (b.satuan === "1") ? " Kg" : " Butir" }}</small>
+                          </b-col>
+                        </b-row>
+                      </div>
+                    </h4>
+                    <hr />
+                    <h5 class="card-title text-uppercase text-muted mb-0">
+                      Verifikasi Retur Order (Pack)
+                    </h5>
+                    <h4 class="font-weight-bold mb-0">
+                      <div v-for="k in retur_order.pack">
+                        <b-row v-for="ko in k.detail_retur_order">
+                          <b-col cols="9">
+                            {{ k.nama_pack }}
+                          </b-col>
+                          <b-col>: {{ ko.jumlah }}
+                            <small> item</small>
+                          </b-col>
+                        </b-row>
+                      </div>
+                    </h4>
+
+                  </div>
+                  <div class="col-auto">
+                    <div class="icon icon-shape bg-dark text-white rounded-circle shadow">
+                      <i class="ni ni-box-2"></i>
+                    </div>
+                  </div>
+                </div>
+              </router-link>
+            </div>
+          </div>
+
         </div>
 
         <div class="col-xl-4 col-md-6">
@@ -189,22 +239,38 @@
 
           <div class="card card-stats">
             <div
-            :class="kembali_orders.filter(it => it.detail_kembali_orders.length > 0).length > 0 ?
+            :class="kembali_orders.barang.filter(it => it.detail_kembali_orders.length > 0).length > 0 ?
             'card-body bg-lighter' : 'card-body'">
               <router-link to="/verify-kembali-orders">
                 <div class="row">
                   <div class="col">
                     <h5 class="card-title text-uppercase text-muted mb-0">
-                      Verifikasi Pengembalian Order
+                      Verifikasi Pengurangan Order (Barang)
                     </h5>
                     <h4 class="font-weight-bold mb-0">
-                      <div v-for="b in kembali_orders">
+                      <div v-for="b in kembali_orders.barang">
                         <b-row v-for="ko in b.detail_kembali_orders">
                           <b-col cols="9">
                             {{ b.nama_barang }}
                           </b-col>
                           <b-col>: {{ ko.jumlah }}
                             <small>{{ (b.satuan === "1") ? " Kg" : " Butir" }}</small>
+                          </b-col>
+                        </b-row>
+                      </div>
+                    </h4>
+                    <hr />
+                    <h5 class="card-title text-uppercase text-muted mb-0">
+                      Verifikasi Pengurangan Order (Pack)
+                    </h5>
+                    <h4 class="font-weight-bold mb-0">
+                      <div v-for="k in kembali_orders.pack">
+                        <b-row v-for="ko in k.detail_kembali_orders">
+                          <b-col cols="9">
+                            {{ k.nama_pack }}
+                          </b-col>
+                          <b-col>: {{ ko.jumlah }}
+                            <small> item</small>
                           </b-col>
                         </b-row>
                       </div>
@@ -319,6 +385,7 @@
         kembali_pack: 0,
         setor_uang: 0,
         kembali_orders: [],
+        retur_order: [],
         from: "",
         to: "",
         profile: {
@@ -461,6 +528,7 @@
           this.kembali_pack = response.data.kembali_pack;
           this.setor_uang = response.data.setor_uang;
           this.kembali_orders = response.data.kembali_orders;
+          this.retur_order = response.data.retur_order;
           this.currentUpdate = response.data.currentUpdate;
           this.generateChart();
         })
